@@ -1,0 +1,115 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "",
+      "email": "",
+      "password": "",
+      "avatar": "",
+      "job": "",
+      "phone": "",
+      "savedCourses": [],
+      "enrolledCourses": []
+    }
+  ],
+  "teachers": [
+    {
+      "id": 1,
+      "name": "",
+      "job": "",
+      "profilePicture": "",
+      "location": "",
+      "courseCount": 0,
+      "rating": 0,
+      "reviewCount": 0
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "",
+      "icon": ""
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "title": "",
+      "description": "",
+      "price": 1,
+      "rating": 1,
+      "reviewCount": 0,
+      "lessonCount": 1,
+      "totalDuration": "",
+      "teacherId": 1,
+      "categoryId": 1,
+      "thumbnail": "",
+      "benefits": [],
+      "sections": [
+        {
+          "title": "",
+          "order": 1,
+          "lessons": [
+            {
+              "title": "",
+              "duration": "",
+              "videoUrl": "",
+              "isLocked": false
+            }
+          ]
+        }
+      ],
+      "resources": []
+    }
+  ],
+  "enrollments": [
+    {
+      "id": 1,
+      "userId": 1,
+      "courseId": 1,
+      "enrollmentDate": "",
+      "progress": 0,
+      "status": "",
+      "completedLessons": []
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "userId": 1,
+      "courseId": 1,
+      "rating": 1,
+      "comment": "",
+      "dateTime": ""
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "userId": 1,
+      "courseId": 1,
+      "content": "Thầy cho hỏi UX với UI khác gì nhau?",
+      "likes": 5,
+      "createdAt": "2025-10-24T10:00:00Z",
+      "answers": [
+        {
+          "id": 1,
+          "userId": 2,
+          "content": "UX là trải nghiệm, UI là giao diện nha!",
+          "likes": 3,
+          "createdAt": "2025-10-24T10:05:00Z"
+        }
+      ]
+    }
+  ],
+  "projects": [
+  {
+    "id": 1,
+    "courseId": 1,
+    "userId": 1,
+    "fileName": "",
+    "title": "",
+    "createdAt": ""
+  }
+]
+}
