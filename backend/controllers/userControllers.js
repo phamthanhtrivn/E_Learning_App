@@ -25,7 +25,14 @@ export const update = async (req, res) => {
 };
 
 export const findById = async (req, res) => {
+  const userId = req.params.id
+  const user = await User.findById(userId)
 
+  if (!user) {
+    return res.status(404).json({ message: "User not found" })
+  }
+
+  return res.json(user)
 };
 
 export const del = async (req, res) => {
