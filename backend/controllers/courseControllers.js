@@ -13,8 +13,7 @@ export const update = async (req, res) => {
 export const findById = async (req, res) => {
   try {
     const { id } = req.params;
-    // const user = await User.findById(id);
-    // ✅ 1. Tìm khóa học theo ID, kèm thông tin giáo viên và danh mục
+
     const course = await Course.findById(id)
       .populate("teacherId", "name job profilePicture")
       .populate("categoryId", "name");
@@ -27,18 +26,15 @@ export const findById = async (req, res) => {
     const courseCategory = await Course.find({ categoryId: course.categoryId, _id: { $ne: course._id } }).limit(5);
 
 
-    // ✅ 2. Lấy danh sách đánh giá (review)
     const reviews = await Review.find({ courseId: id })
       .populate("userId", "name avatar")
       .sort({ createdAt: -1 });
 
-    // ✅ 3. Lấy danh sách câu hỏi và trả lời (nếu có)
     const questions = await Question.find({ courseId: id })
       .populate("userId", "name avatar")
       .populate("answers.userId", "name avatar")
       .sort({ createdAt: -1 });
 
-    // ✅ 4. Tính điểm trung bình và số lượng review
     const reviewCount = reviews.length;
     const averageRating =
       reviewCount > 0
@@ -47,7 +43,6 @@ export const findById = async (req, res) => {
         ).toFixed(1)
         : 0;
 
-    // ✅ 5. Chuẩn hóa dữ liệu trả về
     const result = {
       course: {
         _id: course._id,
@@ -64,7 +59,7 @@ export const findById = async (req, res) => {
         benefits: course.benefits,
         sections: course.sections,
         categoryId: course.categoryId,
-        teacherId: course.teacherId, // đã populate
+        teacherId: course.teacherId,
       },
       reviews,
       questions,
