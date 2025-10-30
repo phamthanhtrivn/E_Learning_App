@@ -13,6 +13,15 @@ import TeacherProfileScreen from "./screens/TeacherProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider } from "./contexts/AuthContext";
+import {
+  MenuProvider,
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from "react-native-popup-menu";
+import { Text } from "react-native";
+import EditProfileScreen from "./screens/EditProfileScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -65,6 +74,57 @@ const MainTabs = () => {
         component={UserProfileScreen}
         options={{ headerShown: true, title: "User's Profile" }}
       />
+      <Tab.Screen
+        name="MyCourses"
+        component={MyCoursesScreen}
+        options={{ headerShown: true, title: "My Courses" }}
+      />
+
+      {/* <Tab.Screen name="coiurseDetail" component={CourseDetailScreen} options={{ headerShown: true, title: "coiurseDetail" }} /> */}
+
+      <Tab.Screen
+        name="Profile"
+        component={UserProfileScreen}
+        options={{
+          headerShown: true,
+          title: "User's Profile",
+          headerRight: () => (
+            <Menu>
+              <MenuTrigger>
+                <Ionicons
+                  name="ellipsis-vertical"
+                  size={22}
+                  color="#333"
+                  style={{ marginRight: 15 }}
+                />
+              </MenuTrigger>
+              <MenuOptions
+                customStyles={{
+                  optionsContainer: {
+                    padding: 5,
+                    borderRadius: 8,
+                    backgroundColor: "#fff",
+                    elevation: 5,
+                    marginTop: 25,
+                    width: 160,
+                  },
+                }}
+              >
+                <MenuOption onSelect={() => console.log("Chỉnh sửa thông tin")}>
+                  <Text style={{ padding: 8, fontSize: 15 }}>
+                    ✏️ Chỉnh sửa thông tin
+                  </Text>
+                </MenuOption>
+                <MenuOption onSelect={() => console.log("Đăng xuất")}>
+                  <Text style={{ padding: 8, color: "red", fontSize: 15 }}>
+                    🚪 Đăng xuất
+                  </Text>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -73,27 +133,32 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Login">
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="MainTabs"
-              component={MainTabs}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
-            <Stack.Screen name="Learning" component={LearningScreen} />
-            <Stack.Screen name="Rating" component={RatingScreen} />
-            <Stack.Screen
-              name="TeacherProfile"
-              component={TeacherProfileScreen}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <MenuProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Login">
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="MainTabs"
+                component={MainTabs}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="CourseDetail"
+                component={CourseDetailScreen}
+              />
+              <Stack.Screen name="Learning" component={LearningScreen} />
+              <Stack.Screen name="Rating" component={RatingScreen} />
+              <Stack.Screen
+                name="TeacherProfile"
+                component={TeacherProfileScreen}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </MenuProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

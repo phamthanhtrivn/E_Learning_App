@@ -1,94 +1,102 @@
-import { useEffect, useState } from "react"
-import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Ionicons } from "@expo/vector-icons"
-import CategoryButton from "../components/CategoryButton"
-import { useFetch } from "../hooks/useFetch"
-import { ActivityIndicator } from "react-native-paper"
-import CourseCard from "../components/CourseCard"
-import TeacherCard from "../components/TeacherCard"
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import CategoryButton from "../components/CategoryButton";
+import { useFetch } from "../hooks/useFetch";
+import { ActivityIndicator } from "react-native-paper";
+import CourseCard from "../components/CourseCard";
+import TeacherCard from "../components/TeacherCard";
 
 type Category = {
-  _id: string
-  name: string
-  icon: string
-}
+  _id: string;
+  name: string;
+  icon: string;
+};
 
 type Course = {
-  _id: string
-  title: string
-  price: number
-  rating: number
-  reviewCount: number
-  lessonCount: number
-  thumbnail: string
+  _id: string;
+  title: string;
+  price: number;
+  rating: number;
+  reviewCount: number;
+  lessonCount: number;
+  thumbnail: string;
   teacher: {
-    name: string
-  }
-}
+    name: string;
+  };
+};
 
 type Teacher = {
-  _id: string
-  name: string
-  job: string
-  profilePicture: string
-  rating: string
-  reviewCount: number
-}
+  _id: string;
+  name: string;
+  job: string;
+  profilePicture: string;
+  rating: string;
+  reviewCount: number;
+};
 
-
-const baseURL = "http://localhost:7000/api"
+const baseURL = "http://localhost:7000/api";
 
 export default function HomeScreen() {
-  const { isLoading, error, get } = useFetch(baseURL)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [popularCourses, setPopularCourses] = useState<Course[]>([])
-  const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([])
-  const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>([])
-  const [topTeachers, setTopTeachers] = useState<Teacher[]>([])
+  const { isLoading, error, get } = useFetch(baseURL);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [popularCourses, setPopularCourses] = useState<Course[]>([]);
+  const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([]);
+  const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>(
+    []
+  );
+  const [topTeachers, setTopTeachers] = useState<Teacher[]>([]);
 
   const fetchCategories = async () => {
-    const data = await get("/categories")
+    const data = await get("/categories");
     if (data) {
-      setCategories(data)
+      setCategories(data);
     }
-  }
+  };
 
   const fetchPopularCourses = async () => {
-    const data = await get("/courses/popular/68ff183db291d258b887715b")
+    const data = await get("/courses/popular/68ff183db291d258b887715b");
     if (data) {
-      setPopularCourses(data)
+      setPopularCourses(data);
     }
-  }
+  };
 
   const fetchRecommendedCourses = async () => {
-    const data = await get("/courses/recommended/68ff183db291d258b887715b")
+    const data = await get("/courses/recommended/68ff183db291d258b887715b");
     if (data) {
-      setRecommendedCourses(data)
+      setRecommendedCourses(data);
     }
-  }
+  };
 
   const fetchInspirationalCourses = async () => {
-    const data = await get("/courses/inspirational/68ff183db291d258b887715b")
+    const data = await get("/courses/inspirational/68ff183db291d258b887715b");
     if (data) {
-      setInspirationalCourses(data)
+      setInspirationalCourses(data);
     }
-  }
+  };
 
   const fetchTopTeachers = async () => {
-    const data = await get("/teachers")
+    const data = await get("/teachers");
     if (data) {
-      setTopTeachers(data)
+      setTopTeachers(data);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchCategories()
-    fetchPopularCourses()
-    fetchRecommendedCourses()
-    fetchInspirationalCourses()
-    fetchTopTeachers()
-  }, [])
+    fetchCategories();
+    fetchPopularCourses();
+    fetchRecommendedCourses();
+    fetchInspirationalCourses();
+    fetchTopTeachers();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,7 +110,11 @@ export default function HomeScreen() {
 
           <View style={styles.headerRight}>
             <Ionicons name="cart-outline" size={22} style={styles.icon} />
-            <Ionicons name="notifications-outline" size={22} style={styles.icon} />
+            <Ionicons
+              name="notifications-outline"
+              size={22}
+              style={styles.icon}
+            />
           </View>
         </View>
 
@@ -150,7 +162,9 @@ export default function HomeScreen() {
             data={popularCourses}
             horizontal
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <CourseCard {...item} orientation="vertical" />}
+            renderItem={({ item }) => (
+              <CourseCard {...item} orientation="vertical" />
+            )}
             scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
             style={styles.coursesList}
@@ -169,7 +183,9 @@ export default function HomeScreen() {
             data={recommendedCourses}
             horizontal
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <CourseCard {...item} orientation="vertical" />}
+            renderItem={({ item }) => (
+              <CourseCard {...item} orientation="vertical" />
+            )}
             scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
             style={styles.coursesList}
@@ -188,7 +204,9 @@ export default function HomeScreen() {
             data={inspirationalCourses}
             horizontal
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <CourseCard {...item} orientation="horizontal" />}
+            renderItem={({ item }) => (
+              <CourseCard {...item} orientation="horizontal" />
+            )}
             scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
             style={styles.coursesList}
@@ -215,7 +233,7 @@ export default function HomeScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -291,6 +309,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginHorizontal: -16,
     paddingHorizontal: 16,
-    marginBottom: 20
+    marginBottom: 20,
   },
-})
+});

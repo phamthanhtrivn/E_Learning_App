@@ -4,6 +4,7 @@ const teacherSchema = new mongoose.Schema({
   name: { type: String, required: true },
   job: { type: String, default: "" },
   profilePicture: { type: String, default: "" },
+  bio: { type: String, default: "" },
   location: { type: String, default: "" },
   courseCount: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
