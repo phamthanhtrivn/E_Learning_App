@@ -5,8 +5,8 @@ import { add, del, findAll, findById, login, register, update, verifyToken } fro
 const userRoute = express.Router()
 
 userRoute.post('/register', register)
-userRoute.post('/login', authUser, login)
-userRoute.post('/verifyToken', verifyToken)
+userRoute.post('/login', login)
+userRoute.post('/verifyToken', authUser,verifyToken)
 userRoute.post('/', add)
 userRoute.get('/:id', findById)
 userRoute.put('/:id', update)

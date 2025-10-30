@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -47,7 +45,7 @@ export default function HomeScreen() {
   const [popularCourses, setPopularCourses] = useState<Course[]>([])
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([])
   const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>([])
-  const [topTeachers, setTopTeachers] = useState<any[]>([])
+  const [topTeachers, setTopTeachers] = useState<Teacher[]>([])
 
   const fetchCategories = async () => {
     const data = await get("/categories")
