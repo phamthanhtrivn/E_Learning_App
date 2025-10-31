@@ -33,9 +33,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
       shadowRadius: 6,
       elevation: 3,
       margin: 8,
-      width: orientation === "vertical" ? 180 : "95%",
+      width: orientation === "vertical" ? 180 : "92%",
       height: orientation === "horizontal" ? 140 : "auto",
       position: "relative",
+      borderWidth: 1,
+      borderColor: "#eee",
     },
     imageContainer: {
       position: "relative",

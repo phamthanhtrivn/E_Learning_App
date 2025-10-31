@@ -1,98 +1,98 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
 import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
 import { useFetch } from "../hooks/useFetch";
-
-type User = {
-  _id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  job: string;
-  phone: string;
-  savedCourses: string[];
-};
+import { User } from "../types/Types";
 
 type AuthContextType = {
   token: string | null;
-  setToken: (token: string | null) => Promise<void>;
   user: User | null;
-  logout: () => void;
   isCheckingAuth: boolean;
+  setAuth: (token: string | null, user?: User | null) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || "http://localhost:7000";
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { post } = useFetch(BASE_URL);
-  const [token, setTokenState] = useState<string | null>(null);
+  const { post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
+  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  // ---- Storage helper (chỉ SecureStore) ----
   const storage = {
-    setItem: async (key: string, value: string) => {
-      if (Platform.OS === "web") localStorage.setItem(key, value);
-      else await SecureStore.setItemAsync(key, value);
-    },
-    getItem: async (key: string) => {
-      if (Platform.OS === "web") return localStorage.getItem(key);
-      return await SecureStore.getItemAsync(key);
-    },
-    deleteItem: async (key: string) => {
-      if (Platform.OS === "web") localStorage.removeItem(key);
-      else await SecureStore.deleteItemAsync(key);
-    }
+    setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+    getItem: (key: string) => SecureStore.getItemAsync(key),
+    deleteItem: (key: string) => SecureStore.deleteItemAsync(key),
   };
 
-  // Khi login thành công
-  const setToken = async (newToken: string | null) => {
-    setTokenState(newToken);
-    if (newToken) await storage.setItem("token", newToken);
-    else await storage.deleteItem("token");
-  };
-
-  const fetchUser = async (jwt: string) => {
+  // ---- Xác thực token ----
+  const verifyToken = async (jwt: string): Promise<User | null> => {
     try {
       const response = await post("/users/verifyToken", { token: jwt });
-      if (response?.user) setUser(response.user);
-      else logout();
+      return response?.user ?? null;
     } catch {
-      logout();
+      return null;
     }
   };
 
-  const logout = async () => {
-    await setToken(null);
+  const setAuth = async (newToken: string | null, newUser?: User | null) => {
+  if (newToken && newUser) {
+    await storage.setItem("token", newToken);
+    setToken(newToken);
+    setUser(newUser);
+  } else {
+    await storage.deleteItem("token");
+    setToken(null);
     setUser(null);
+  }
+};
+
+  const logout = async () => {
+    await setAuth(null);
   };
 
-  // Tự động đọc token khi app mở
   useEffect(() => {
-    const initAuth = async () => {
+    const initializeAuth = async () => {
       const savedToken = await storage.getItem("token");
       if (savedToken) {
-        setTokenState(savedToken);
-        await fetchUser(savedToken);
+        const verifiedUser = await verifyToken(savedToken);
+        if (verifiedUser) await setAuth(savedToken, verifiedUser);
+        else await logout();
       }
       setIsCheckingAuth(false);
     };
-    initAuth();
+    initializeAuth();
   }, []);
 
-  // Khi token thay đổi
+  // ---- Khi token thay đổi ----
   useEffect(() => {
-    if (token) fetchUser(token);
+    const updateUser = async () => {
+      if (token) {
+        const verifiedUser = await verifyToken(token);
+        if (verifiedUser) setUser(verifiedUser);
+        else await logout();
+      }
+    };
+    updateUser();
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, logout, isCheckingAuth }}>
+    <AuthContext.Provider
+      value={{ token, user, isCheckingAuth, setAuth, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// ---- Hook tiện dùng ----
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

@@ -11,8 +11,13 @@ const createToken = (user) => {
 };
 
 export const verifyToken = async (req, res) => {
-  const user = await User.findById(req.userId).select("-password");
-  res.json(user);
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
+    res.json({ user });
+  } catch {
+    res.status(500).json({ message: "Lỗi xác thực" });
+  }
 };
 
 export const register = async (req, res) => {};
@@ -27,8 +32,9 @@ export const login = async (req, res) => {
   if (!isMatch) return res.status(400).json({ message: "Sai mật khẩu" });
 
   const token = createToken(user);
+  const userData = await User.findById(user._id).select("-password");
 
-  res.json({ token });
+  res.json({ token, user: userData });
 };
 
 

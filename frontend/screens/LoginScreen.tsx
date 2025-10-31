@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,36 +15,32 @@ import { useFetch } from "../hooks/useFetch";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 
-const baseURL = "http://localhost:7000/api";
-
 export default function LoginScreen() {
-  const { isLoading, post } = useFetch(baseURL);
+  const { isLoading, post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { setToken } = useAuth()
-  const navigation = useNavigation()
-
-  const showAlert = (title: string, message: string) => {
-    if (Platform.OS === "web") {
-      window.alert(`${title}: ${message}`);
-    } else {
-      Alert.alert(title, message);
-    }
-  };
+  const { setAuth } = useAuth();
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      showAlert("Error", "Please enter both email and password.");
+      Alert.alert("Validation Error", "Please enter both email and password.");
       return;
     }
+
     const response = await post("/users/login", { email, password });
 
-    if (response && response.token) {
-      setToken(response.token)
-      navigation.navigate("MainTabs" as never);
+    if (response?.token && response?.user) {
+      await setAuth(response.token, response.user);
+      setTimeout(() => {
+        navigation.navigate("MainTabs" as never);
+      }, 1500);
     } else {
-      showAlert("Error", response.message || "Login failed. Please try again.");
+      Alert.alert(
+        "Error",
+        response?.message || "Login failed. Please try again."
+      );
     }
   };
 

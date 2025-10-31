@@ -14,39 +14,12 @@ import { useFetch } from "../hooks/useFetch";
 import { ActivityIndicator } from "react-native-paper";
 import CourseCard from "../components/CourseCard";
 import TeacherCard from "../components/TeacherCard";
-
-type Category = {
-  _id: string;
-  name: string;
-  icon: string;
-};
-
-type Course = {
-  _id: string;
-  title: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  lessonCount: number;
-  thumbnail: string;
-  teacher: {
-    name: string;
-  };
-};
-
-type Teacher = {
-  _id: string;
-  name: string;
-  job: string;
-  profilePicture: string;
-  rating: string;
-  reviewCount: number;
-};
-
-const baseURL = "http://localhost:7000/api";
+import { useAuth } from "../contexts/AuthContext";
+import { Category, Course, Teacher, User } from "../types/Types";
 
 export default function HomeScreen() {
-  const { isLoading, error, get } = useFetch(baseURL);
+  const { user } = useAuth()
+  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularCourses, setPopularCourses] = useState<Course[]>([]);
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([]);
@@ -63,21 +36,21 @@ export default function HomeScreen() {
   };
 
   const fetchPopularCourses = async () => {
-    const data = await get("/courses/popular/68ff183db291d258b887715b");
+    const data = await get(`/courses/popular/${user && (user as User)?._id}`);
     if (data) {
       setPopularCourses(data);
     }
   };
 
   const fetchRecommendedCourses = async () => {
-    const data = await get("/courses/recommended/68ff183db291d258b887715b");
+    const data = await get(`/courses/recommended/${user && (user as User)?._id}`);
     if (data) {
       setRecommendedCourses(data);
     }
   };
 
   const fetchInspirationalCourses = async () => {
-    const data = await get("/courses/inspirational/68ff183db291d258b887715b");
+    const data = await get(`/courses/inspirational/${user && (user as User)?._id}`);
     if (data) {
       setInspirationalCourses(data);
     }
@@ -104,7 +77,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.helloText}>Hello, Tri!</Text>
+            <Text style={styles.helloText}>Hello, {user && (user as User)?.name}</Text>
             <Text style={styles.subText}>What do you want to learn today?</Text>
           </View>
 

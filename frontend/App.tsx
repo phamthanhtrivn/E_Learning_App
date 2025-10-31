@@ -72,19 +72,6 @@ const MainTabs = () => {
       <Tab.Screen
         name="Profile"
         component={UserProfileScreen}
-        options={{ headerShown: true, title: "User's Profile" }}
-      />
-      <Tab.Screen
-        name="MyCourses"
-        component={MyCoursesScreen}
-        options={{ headerShown: true, title: "My Courses" }}
-      />
-
-      {/* <Tab.Screen name="coiurseDetail" component={CourseDetailScreen} options={{ headerShown: true, title: "coiurseDetail" }} /> */}
-
-      <Tab.Screen
-        name="Profile"
-        component={UserProfileScreen}
         options={{
           headerShown: true,
           title: "User's Profile",
