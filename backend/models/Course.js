@@ -26,7 +26,8 @@ const courseSchema = new mongoose.Schema({
   thumbnail: String,
   benefits: [String],
   sections: [sectionSchema],
-  resources: [String]
+  resources: [String],
+  isInspirational: { type: Boolean, default: false }
 }, { timestamps: true });
 
 const Course = mongoose.models.course || mongoose.model("course", courseSchema);

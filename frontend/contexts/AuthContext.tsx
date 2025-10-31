@@ -12,6 +12,7 @@ import { User } from "../types/Types";
 type AuthContextType = {
   token: string | null;
   user: User | null;
+  setUser: (user: User | null) => void;
   isCheckingAuth: boolean;
   setAuth: (token: string | null, user?: User | null) => Promise<void>;
   logout: () => Promise<void>;
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, isCheckingAuth, setAuth, logout }}
+      value={{ token, user, setUser, isCheckingAuth, setAuth, logout }}
     >
       {children}
     </AuthContext.Provider>

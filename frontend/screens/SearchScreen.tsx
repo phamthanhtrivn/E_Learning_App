@@ -6,6 +6,8 @@ import CategoryButton from "../components/CategoryButton"
 import CourseCard from "../components/CourseCard"
 import { useFetch } from "../hooks/useFetch"
 import { ActivityIndicator } from "react-native-paper"
+import { useAuth } from "../contexts/AuthContext"
+import { User } from "../types/Types"
 
 type Category = {
   _id: string
@@ -26,10 +28,9 @@ type Course = {
   }
 }
 
-const baseURL = "http://localhost:7000/api"
-
 export default function SearchScreen() {
-  const { isLoading, error, get } = useFetch(baseURL)
+  const { user } = useAuth()
+  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL)
   const [categories, setCategories] = useState<Category[]>([])
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([])
   const [searchText, setSearchText] = useState("")
@@ -42,7 +43,7 @@ export default function SearchScreen() {
   }
 
   const fetchRecommendedCourses = async () => {
-    const data = await get("/courses/recommended/68ff183db291d258b887715b")
+    const data = await get(`/courses/recommended/${user && (user as User)?._id}`)
     if (data) setRecommendedCourses(data)
   }
 

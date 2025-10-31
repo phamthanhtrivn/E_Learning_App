@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     job: { type: String, default: "" },
     phone: { type: String, default: "" },
     savedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "course" }],
+    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "course" }],
   },
   { timestamps: true }
 );

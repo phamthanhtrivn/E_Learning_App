@@ -1,6 +1,11 @@
 import type React from "react"
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
+import { useState } from "react"
+import { useAuth } from "../contexts/AuthContext"
+import { User } from "../types/Types"
+import { useFetch } from "../hooks/useFetch"
 
 interface CourseCardProps {
   _id: string
@@ -14,6 +19,7 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
+  _id,
   title,
   price,
   rating,
@@ -86,15 +92,41 @@ const CourseCard: React.FC<CourseCardProps> = ({
       padding: 4,
     },
   })
+  const { user, setUser } = useAuth()
+  const { post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL)
+  const [isSaved, setIsSaved] = useState((user as User)?.savedCourses?.includes(_id) || false)
+  
+  const navigation = useNavigation<any>()
+
+  const handleNavigate = () => {
+    navigation.navigate("CourseDetail", { _id })
+  }
+
+  const handleToggleSave = async () => {
+    
+    const response = await post(`/users/saveCourse`, { userId: (user as User)._id, courseId: _id })
+
+    if (response?.savedCourses) {
+      setIsSaved(response.savedCourses.includes(_id))
+      setUser({ ...user, savedCourses: response.savedCourses } as User)
+    }
+    setIsSaved(!isSaved)
+  }
 
   return (
     <TouchableOpacity style={styles.container} activeOpacity={0.7}>
-      <Ionicons name="bookmark-outline" size={20} color="#222" style={styles.bookmark} />
+      <TouchableOpacity
+        style={[styles.bookmark, isSaved && { backgroundColor: "#E0F7FF" }]}
+        onPress={handleToggleSave}
+        activeOpacity={0.7}
+      >
+        <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} size={20} color={isSaved ? "#00AEEF" : "#999"} />
+      </TouchableOpacity>
 
-      <View style={styles.imageContainer}>
+      <TouchableOpacity style={styles.imageContainer} onPress={handleNavigate}>
         <Image source={{ uri: thumbnail }} style={styles.image} />
-      </View>
-      <View style={styles.content}>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.content} onPress={handleNavigate}>
         <View>
           <Text style={styles.title} numberOfLines={2}>
             {title}
@@ -108,7 +140,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {rating} ({reviewCount}) • {lessonCount} lessons
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     </TouchableOpacity>
   )
 }

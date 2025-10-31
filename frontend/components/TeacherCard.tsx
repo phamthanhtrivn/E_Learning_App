@@ -1,24 +1,28 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-type TeacherCardProps = {
-  _id: string;
-  name: string;
-  job: string;
-  profilePicture: string;
-  rating: string;
-  reviewCount: number;
-};
+import { useNavigation } from "@react-navigation/native";
+import { Teacher } from "../types/Types";
 
 export default function TeacherCard({
+  _id,
   name,
   job,
   profilePicture,
   rating,
   reviewCount,
-}: TeacherCardProps) {
+}: Teacher) {
+  const navigation = useNavigation<any>();
+
+  const handleNavigate = () => {
+    navigation.navigate("TeacherProfile", { _id });
+  };
+
   return (
-    <TouchableOpacity style={styles.container} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.7}
+      onPress={handleNavigate}
+    >
       <Image source={{ uri: profilePicture }} style={styles.profileImage} />
       <Text style={styles.name}>{name}</Text>
       <Text style={styles.job}>{job}</Text>

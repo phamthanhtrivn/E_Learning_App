@@ -136,12 +136,14 @@ export default function App() {
               <Stack.Screen
                 name="CourseDetail"
                 component={CourseDetailScreen}
+                options={{ headerShown: false }}
               />
               <Stack.Screen name="Learning" component={LearningScreen} />
               <Stack.Screen name="Rating" component={RatingScreen} />
               <Stack.Screen
                 name="TeacherProfile"
                 component={TeacherProfileScreen}
+                options={{ title: "Teacher Profile", headerBackVisible: true }}
               />
             </Stack.Navigator>
           </NavigationContainer>

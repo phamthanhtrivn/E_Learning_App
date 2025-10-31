@@ -11,6 +11,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import * as Progress from "react-native-progress";
 import { useFetch } from "../hooks/useFetch";
+import { useAuth } from "../contexts/AuthContext";
 
 type Enrollment = {
   _id: string;
@@ -25,13 +26,14 @@ type Enrollment = {
 };
 
 export default function MyCoursesScreen() {
-  const { isLoading, error, get } = useFetch("http://localhost:7000");
+  const { user } = useAuth();
+  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [activeTab, setActiveTab] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL");
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await get('/api/enrollments/user/68ff183db291d258b8877159');
+      const res = await get('/enrollments/user/' + (user && user._id));
       setEnrollments(res || []);
     };
     fetchData();
@@ -125,6 +127,7 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: { fontSize: 20, fontWeight: "700", padding: 16, color: "#000" },
   banner: {
+    marginTop: 16,
     backgroundColor: "#E9D5FF",
     marginHorizontal: 16,
     borderRadius: 16,

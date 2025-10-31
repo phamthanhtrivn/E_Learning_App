@@ -1,27 +1,23 @@
-import React, { useState, useEffect, use } from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
-import ProfileHeader from '../components/ProfileHeader';
-import CourseCard from '../components/CourseCard';
-import { useFetch } from '../hooks/useFetch';
-export type Course = {
-  id: string;
-  title: string;
-  price: number;
-  rating: number;
-  thumbnail: string;
-  lessons: number;
-  reviewCount: number;
-  teacherId: {
-    name: string;
-  };
-};
+import React, { useState, useEffect, use } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  StatusBar,
+  ActivityIndicator,
+} from "react-native";
+import ProfileHeader from "../components/ProfileHeader";
+import CourseCard from "../components/CourseCard";
+import { useFetch } from "../hooks/useFetch";
+import { useAuth } from "../contexts/AuthContext";
+import { Course } from "../types/Types";
+
 export type counts = {
-
-  saved: number,
-  ongoing: number,
-  completed: number
-
-}
+  saved: number;
+  ongoing: number;
+  completed: number;
+};
 export type UserProfile = {
   _id?: string;
   name?: string;
@@ -37,16 +33,19 @@ export type UserProfile = {
   reviewCount?: number;
 };
 
-
 const UserProfile = () => {
-
-  const { isLoading, error, get } = useFetch('http://localhost:7000');
+  const { user } = useAuth();
+  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [savedCourses, setSavedCourses] = useState<Course[]>([]);
-  const [counts, setCounts] = useState<counts>({ saved: 0, ongoing: 0, completed: 0 });
+  const [counts, setCounts] = useState<counts>({
+    saved: 0,
+    ongoing: 0,
+    completed: 0,
+  });
   useEffect(() => {
     const fetchUser = async () => {
-      const data = await get('/api/users/68ff183db291d258b8877159');
+      const data = await get("/users/" + (user && user._id));
       setUserData(data.user);
       setSavedCourses(data.savedCourses);
       setCounts(data.counts);
@@ -54,10 +53,9 @@ const UserProfile = () => {
     fetchUser();
   }, []);
 
-
   if (isLoading) {
     return (
-      <View >
+      <View>
         <ActivityIndicator size="large" color="#000" />
       </View>
     );
@@ -65,7 +63,7 @@ const UserProfile = () => {
 
   if (error) {
     return (
-      <View >
+      <View>
         <Text>Error: {error}</Text>
       </View>
     );
@@ -73,7 +71,7 @@ const UserProfile = () => {
 
   if (!userData) {
     return (
-      <View >
+      <View>
         <Text>No user data</Text>
       </View>
     );
@@ -81,7 +79,6 @@ const UserProfile = () => {
 
   return (
     <View style={styles.container}>
-
       <StatusBar barStyle="dark-content" />
 
       <ScrollView
@@ -108,21 +105,10 @@ const UserProfile = () => {
           <Text style={styles.sectionTitle}>Saved courses</Text>
 
           {savedCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              title={course.title}
-              author={course.teacherId.name}
-              price={`$${course.price}`}
-              rating={course.rating}
-              totalReviews={course.reviewCount}
-              lessons={course.lessons}
-              image={course.thumbnail}
-              orientation="horizontal"
-            />
+            <CourseCard {...course} orientation="horizontal" />
           ))}
         </View>
       </ScrollView>
-
     </View>
   );
 };
@@ -130,7 +116,7 @@ const UserProfile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
@@ -141,30 +127,30 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     marginLeft: 20,
     marginBottom: 16,
   },
   statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingHorizontal: 40,
     paddingBottom: 24,
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statNumber: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 13,
-    color: '#888',
-  }
+    color: "#888",
+  },
 });
 
 export default UserProfile;

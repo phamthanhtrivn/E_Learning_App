@@ -33,9 +33,10 @@ export default function LoginScreen() {
 
     if (response?.token && response?.user) {
       await setAuth(response.token, response.user);
-      setTimeout(() => {
-        navigation.navigate("MainTabs" as never);
-      }, 1500);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainTabs" as never }],
+      });
     } else {
       Alert.alert(
         "Error",

@@ -16,7 +16,8 @@ export const useFetch = (baseUrl: string) => {
       });
 
       if (!response.ok) {
-        throw new Error("Request went wrong!");
+        console.log("❌ Status:", response.status, response.statusText);
+        throw new Error(`Request failed with status ${response.status}`);
       }
 
       return await response.json();
@@ -34,5 +35,5 @@ export const useFetch = (baseUrl: string) => {
     request(url, { method: "PUT", body: JSON.stringify(body) });
   const del = (url: string) => request(url, { method: "DELETE" });
 
-  return { isLoading, error, get, post, put, del}
+  return { isLoading, error, get, post, put, del };
 };

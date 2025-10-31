@@ -18,7 +18,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Category, Course, Teacher, User } from "../types/Types";
 
 export default function HomeScreen() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularCourses, setPopularCourses] = useState<Course[]>([]);
@@ -30,9 +30,7 @@ export default function HomeScreen() {
 
   const fetchCategories = async () => {
     const data = await get("/categories");
-    if (data) {
-      setCategories(data);
-    }
+    if (data) setCategories(data);
   };
 
   const fetchPopularCourses = async () => {
@@ -43,14 +41,18 @@ export default function HomeScreen() {
   };
 
   const fetchRecommendedCourses = async () => {
-    const data = await get(`/courses/recommended/${user && (user as User)?._id}`);
+    const data = await get(
+      `/courses/recommended/${user && (user as User)?._id}`
+    );
     if (data) {
       setRecommendedCourses(data);
     }
   };
 
   const fetchInspirationalCourses = async () => {
-    const data = await get(`/courses/inspirational/${user && (user as User)?._id}`);
+    const data = await get(
+      `/courses/inspirational/${user && (user as User)?._id}`
+    );
     if (data) {
       setInspirationalCourses(data);
     }
@@ -65,11 +67,15 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return; 
     fetchPopularCourses();
     fetchRecommendedCourses();
     fetchInspirationalCourses();
     fetchTopTeachers();
-  }, []);
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -77,7 +83,9 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.helloText}>Hello, {user && (user as User)?.name}</Text>
+            <Text style={styles.helloText}>
+              Hello, {user && (user as User)?.name}
+            </Text>
             <Text style={styles.subText}>What do you want to learn today?</Text>
           </View>
 

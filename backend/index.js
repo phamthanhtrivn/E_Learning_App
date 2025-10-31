@@ -47,5 +47,5 @@ app.get("/", (req, res) => {
 
 // 6️⃣ Listen trên 0.0.0.0 (bắt buộc để thiết bị khác truy cập được)
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server running at http://192.168.1.10:${PORT}`);
+  console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
 });
