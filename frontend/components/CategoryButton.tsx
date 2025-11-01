@@ -1,4 +1,6 @@
+import { useNavigation } from "@react-navigation/native"
 import { Text, StyleSheet, TouchableOpacity, Image } from "react-native"
+import { useFetch } from "../hooks/useFetch"
 
 type CategoryItemProps = {
   item: {
@@ -29,11 +31,20 @@ const categoryColors: { [key: string]: string } = {
 
 export default function CategoryButton({ item }: CategoryItemProps) {
   const bgColor = categoryColors[item.name.toLowerCase()] || "#0A8AFF"
+  const navigation = useNavigation<any>()
+
+  const handlePress = () => {
+    navigation.navigate("CourseByCategory", {
+      _id: item._id,
+      name: item.name,
+    })
+  }
 
   return (
     <TouchableOpacity
       style={[styles.categoryCard, { backgroundColor: bgColor }]}
       activeOpacity={0.7}
+      onPress={handlePress}
     >
       <Image
         source={iconMapper[item.icon]}

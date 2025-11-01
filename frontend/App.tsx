@@ -22,6 +22,7 @@ import {
 } from "react-native-popup-menu";
 import { Text } from "react-native";
 import EditProfileScreen from "./screens/EditProfileScreen";
+import CourseByCategoryScreen from "./screens/CourseByCategoryScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -144,6 +145,14 @@ export default function App() {
                 name="TeacherProfile"
                 component={TeacherProfileScreen}
                 options={{ title: "Teacher Profile", headerBackVisible: true }}
+              />
+              <Stack.Screen
+                name="CourseByCategory"
+                component={CourseByCategoryScreen}
+                options={({ route }) => ({
+                  title: `${(route.params as any)?.name} Courses` || "Courses",
+                  headerBackTitle: "Back",
+                })}
               />
             </Stack.Navigator>
           </NavigationContainer>

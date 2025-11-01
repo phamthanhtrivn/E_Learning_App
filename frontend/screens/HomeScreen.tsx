@@ -9,29 +9,22 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import CategoryButton from "../components/CategoryButton";
 import { useFetch } from "../hooks/useFetch";
 import { ActivityIndicator } from "react-native-paper";
 import CourseCard from "../components/CourseCard";
 import TeacherCard from "../components/TeacherCard";
 import { useAuth } from "../contexts/AuthContext";
-import { Category, Course, Teacher, User } from "../types/Types";
+import { Course, Teacher, User } from "../types/Types";
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [popularCourses, setPopularCourses] = useState<Course[]>([]);
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([]);
   const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>(
     []
   );
   const [topTeachers, setTopTeachers] = useState<Teacher[]>([]);
-
-  const fetchCategories = async () => {
-    const data = await get("/categories");
-    if (data) setCategories(data);
-  };
 
   const fetchPopularCourses = async () => {
     const data = await get(`/courses/popular/${user && (user as User)?._id}`);
@@ -66,16 +59,11 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return; 
     fetchPopularCourses();
     fetchRecommendedCourses();
     fetchInspirationalCourses();
     fetchTopTeachers();
-  }, [user]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,28 +96,6 @@ export default function HomeScreen() {
             <Text style={styles.bannerBtnText}>JOIN NOW</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Categories Section Header */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <Text style={styles.viewMore}>View more</Text>
-        </View>
-
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#0A8AFF" animating />
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          <FlatList
-            data={categories}
-            numColumns={2}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item }) => <CategoryButton item={item} />}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.columnWrapper}
-            style={styles.categoriesList}
-          />
-        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Popular courses</Text>

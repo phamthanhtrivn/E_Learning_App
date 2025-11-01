@@ -10,6 +10,45 @@ export const update = async (req, res) => {};
 
 export const del = async (req, res) => {};
 
+export const findByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const courses = await Course.find({ categoryId });
+
+    res.json({ total: courses.length, results: courses});
+  } catch (error) {
+    console.error("❌ Error fetching courses by category:", error);
+    res.status(500).json({
+      message: "Server error while fetching courses by category",
+      error: error.message,
+    });
+  }
+};
+
+export const searchCourses = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.status(400).json({ message: "Missing search keyword" });
+
+    const regex = new RegExp(q, "i");
+
+    const courses = await Course.find({
+      $or: [
+        { title: regex },
+        { description: regex },
+        { "sections.lessons.title": regex }
+      ]
+    })
+      .populate("teacherId", "name")
+      .populate("categoryId", "name")
+
+    res.json({ total: courses.length, results: courses });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 export const findById = async (req, res) => {
   try {
