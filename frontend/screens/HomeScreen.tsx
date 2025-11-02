@@ -14,7 +14,7 @@ import { ActivityIndicator } from "react-native-paper";
 import CourseCard from "../components/CourseCard";
 import TeacherCard from "../components/TeacherCard";
 import { useAuth } from "../contexts/AuthContext";
-import { Course, Teacher, User } from "../types/Types";
+import { Category, Course, Teacher, User } from "../types/Types";
 import { useNavigation } from "@react-navigation/native";
 
 export default function HomeScreen() {
@@ -22,11 +22,13 @@ export default function HomeScreen() {
   const { isLoading, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [popularCourses, setPopularCourses] = useState<Course[]>([]);
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([]);
-  const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>([]);
+  const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>(
+    []
+  );
   const [topTeachers, setTopTeachers] = useState<Teacher[]>([]);
   const navigation = useNavigation<any>();
 
-  const [refreshing, setRefreshing] = useState(false); // ✅ FIX: pull-to-refresh state
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchPopularCourses = async () => {
     const data = await get(`/courses/popular/${(user as User)?._id}`);
@@ -122,9 +124,13 @@ export default function HomeScreen() {
                   What do you want to learn today?
                 </Text>
               </View>
-
               <View style={styles.headerRight}>
-                <Ionicons name="cart-outline" size={22} style={styles.icon} />
+                <Ionicons
+                  onPress={() => navigation.navigate("Cart")}
+                  name="cart-outline"
+                  size={22}
+                  style={styles.icon}
+                />
                 <Ionicons
                   name="notifications-outline"
                   size={22}

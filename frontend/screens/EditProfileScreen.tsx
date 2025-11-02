@@ -13,7 +13,6 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function EditProfileScreen({ navigation, route }: any) {
-    // Nhận dữ liệu user hiện tại (có thể truyền qua navigation)
     const currentUser = route?.params?.user || {
         name: "Nguyễn Văn A",
         email: "vana@example.com",
@@ -30,7 +29,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
     const [avatar, setAvatar] = useState(currentUser.avatar);
     const [isSaving, setIsSaving] = useState(false);
 
-    // Chọn ảnh đại diện mới
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -43,7 +41,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
         }
     };
 
-    // Hàm lưu dữ liệu (giả lập gọi API)
     const handleSave = async () => {
         if (!name.trim() || !email.trim()) {
             Alert.alert("Lỗi", "Tên và Email không được để trống!");
@@ -53,8 +50,7 @@ export default function EditProfileScreen({ navigation, route }: any) {
         setIsSaving(true);
 
         try {
-            // Gọi API PUT: /api/users/:id (ví dụ)
-            // await updateUser(currentUser._id, { name, email, job, phone, avatar });
+
             setTimeout(() => {
                 setIsSaving(false);
                 Alert.alert("Thành công", "Cập nhật thông tin thành công!");
@@ -68,7 +64,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
 
     return (
         <ScrollView style={styles.container}>
-            {/* Ảnh đại diện */}
             <View style={styles.avatarContainer}>
                 <TouchableOpacity onPress={pickImage}>
                     <Image source={{ uri: avatar }} style={styles.avatar} />
@@ -78,7 +73,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                 </TouchableOpacity>
             </View>
 
-            {/* Form chỉnh sửa */}
             <View style={styles.form}>
                 <Text style={styles.label}>Họ và tên</Text>
                 <TextInput

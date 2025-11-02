@@ -1,179 +1,285 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  ActivityIndicator,
-} from "react-native";
-import { Feather } from "@expo/vector-icons";
-import * as Progress from "react-native-progress";
-import { useFetch } from "../hooks/useFetch";
-import { useAuth } from "../contexts/AuthContext";
+"use client"
 
-type Enrollment = {
-  _id: string;
-  progress: number;
-  status: "ONGOING" | "COMPLETED";
-  courseId: {
-    _id: string;
-    title: string;
-    thumbnail: string;
-    totalDuration: string;
-  };
-};
+import { useEffect, useState } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from "react-native"
+import { Feather } from "@expo/vector-icons"
+import * as Progress from "react-native-progress"
+import { LinearGradient } from "expo-linear-gradient"
+import { useFetch } from "../hooks/useFetch"
+import { useAuth } from "../contexts/AuthContext"
+import type { Enrollment } from "../types/Types"
 
 export default function MyCoursesScreen() {
-  const { user } = useAuth();
-  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
-  const [activeTab, setActiveTab] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL");
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const { user } = useAuth()
+  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL)
+  const [activeTab, setActiveTab] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL")
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await get('/enrollments/user/' + (user && user._id));
-      setEnrollments(res || []);
-    };
-    fetchData();
-  }, []);
+      const res = await get("/enrollments/user/" + (user && user._id))
+      setEnrollments(res || [])
+    }
+    fetchData()
+  }, [])
 
   const filteredCourses = enrollments.filter((e) => {
-    if (activeTab === "ALL") return true;
-    return e.status === activeTab;
-  });
+    if (activeTab === "ALL") return true
+    return e.status === activeTab
+  })
 
   if (isLoading)
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#7c3aed" />
+        <ActivityIndicator size="large" color="#6366f1" />
       </View>
-    );
+    )
 
-  if (error) return <Text>Error: {error}</Text>;
+  if (error) return <Text style={styles.errorText}>Error: {error}</Text>
 
   return (
     <View style={styles.container}>
-      {/* Header */}
 
-      {/* Banner */}
-      <View style={styles.banner}>
-        <View>
-          <Text style={styles.bannerTitle}>Courses that boost your career!</Text>
+
+      <LinearGradient
+        colors={["#6366f1", "#8b5cf6"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.banner}
+      >
+        <View style={styles.bannerContent}>
+          <Text style={styles.bannerTitle}>Expand your skills</Text>
+          <Text style={styles.bannerSubtitle}>Explore new courses to grow faster</Text>
           <TouchableOpacity style={styles.bannerBtn}>
-            <Text style={styles.bannerBtnText}>Check Now</Text>
+            <Text style={styles.bannerBtnText}>Discover</Text>
+            <Feather name="arrow-right" size={14} color="#fff" style={{ marginLeft: 6 }} />
           </TouchableOpacity>
         </View>
-        <Image
-          source={{ uri: "https://res.cloudinary.com/dsnuolexo/image/upload/v1761737805/image-Photoroom_dkzahz.png" }}
-          style={styles.bannerImage}
-        />
-      </View>
+        <View style={styles.bannerImageWrapper}>
+          <Image
+            source={{ uri: "https://res.cloudinary.com/dsnuolexo/image/upload/v1761737805/image-Photoroom_dkzahz.png" }}
+            style={styles.bannerImage}
+          />
+        </View>
+      </LinearGradient>
 
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        {["ALL", "ONGOING", "COMPLETED"].map((tab) => (
-          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab as any)}>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === tab && styles.tabTextActive,
-              ]}
+      <View style={styles.tabsContainer}>
+        <View style={styles.tabs}>
+          {["ALL", "ONGOING", "COMPLETED"].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.tab, activeTab === tab && styles.tabActive]}
+              onPress={() => setActiveTab(tab as any)}
             >
-              {tab}
-            </Text>
-            {activeTab === tab && <View style={styles.tabUnderline} />}
-          </TouchableOpacity>
-        ))}
+              <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>{tab}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      {/* Course List */}
       <FlatList
         data={filteredCourses}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item._id}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         renderItem={({ item }) => (
-          <View style={styles.courseCard}>
+          <TouchableOpacity style={styles.courseCard} activeOpacity={0.85}>
             <Image
-              source={{ uri: item.courseId.thumbnail }}
+              source={{ uri: typeof item.courseId === "object" ? item.courseId.thumbnail : "" }}
               style={styles.courseImage}
             />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.courseTitle}>{item.courseId.title}</Text>
-              <Text style={styles.courseDuration}>
-                {item.courseId.totalDuration}
+            <View style={styles.courseContent}>
+              <Text style={styles.courseTitle} numberOfLines={2}>
+                {typeof item.courseId === "object" ? item.courseId.title : ""}
               </Text>
-              <Text style={styles.progressText}>{item.progress}% Complete</Text>
-              <Progress.Bar
-                progress={item.progress / 100}
-                color="#7c3aed"
-                unfilledColor="#e2e8f0"
-                borderWidth={0}
-                width={180}
-                height={6}
-              />
+              <Text style={styles.courseDuration}>
+                {typeof item.courseId === "object" ? item.courseId.totalDuration : ""}
+              </Text>
+              <View style={styles.progressContainer}>
+                <Progress.Bar
+                  progress={item.progress / 100}
+                  color="#6366f1"
+                  unfilledColor="#e2e8f0"
+                  borderWidth={0}
+                  width={200}
+                  height={5}
+                  borderRadius={2.5}
+                />
+                <Text style={styles.progressText}>{item.progress}%</Text>
+              </View>
             </View>
-          </View>
+            <Feather name="chevron-right" size={20} color="#cbd5e1" />
+          </TouchableOpacity>
         )}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f9fafb" },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 20, fontWeight: "700", padding: 16, color: "#000" },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8fafc",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#ef4444",
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#0f172a",
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: "#64748b",
+    fontWeight: "500",
+  },
   banner: {
-    marginTop: 16,
-    backgroundColor: "#E9D5FF",
     marginHorizontal: 16,
+    marginVertical: 16,
     borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
-  bannerTitle: { fontSize: 14, color: "#4B0082", fontWeight: "600", width: 150 },
+  bannerContent: { flex: 1 },
+  bannerTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  bannerSubtitle: {
+    fontSize: 13,
+    color: "rgba(255, 255, 255, 0.85)",
+    fontWeight: "400",
+    marginBottom: 12,
+  },
   bannerBtn: {
-    backgroundColor: "#7c3aed",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
   },
-  bannerBtnText: { color: "#fff", fontSize: 12, fontWeight: "500" },
-  bannerImage: { width: 150, height: 150, borderRadius: 40, resizeMode: "contain" },
+  bannerBtnText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  bannerImageWrapper: {
+    overflow: "hidden",
+    borderRadius: 12,
+  },
+  bannerImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    resizeMode: "contain",
+  },
+  tabsContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
   tabs: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-    borderBottomWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingBottom: 8,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 10,
+    padding: 4,
   },
-  tabText: { color: "#94A3B8", fontSize: 13, fontWeight: "600", textAlign: "center" },
-  tabTextActive: { color: "#7c3aed" },
-  tabUnderline: {
-    height: 2,
-    backgroundColor: "#7c3aed",
-    width: 30,
-    alignSelf: "center",
-    marginTop: 4,
-    borderRadius: 2,
+  tab: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabActive: {
+    backgroundColor: "#fff",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748b",
+  },
+  tabTextActive: {
+    color: "#6366f1",
   },
   courseCard: {
     flexDirection: "row",
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 10,
+    padding: 12,
     marginBottom: 12,
     alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
   },
-  courseImage: { width: 70, height: 70, borderRadius: 10, marginRight: 10 },
-  courseTitle: { fontSize: 14, fontWeight: "600", color: "#000" },
-  courseDuration: { fontSize: 12, color: "#6b7280", marginTop: 2 },
-  progressText: { fontSize: 11, color: "#6b7280", marginTop: 6, marginBottom: 4 },
-});
+  courseImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    marginRight: 12,
+    backgroundColor: "#e2e8f0",
+  },
+  courseContent: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  courseTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0f172a",
+    marginBottom: 4,
+  },
+  courseDuration: {
+    fontSize: 12,
+    color: "#94a3b8",
+    marginBottom: 8,
+    fontWeight: "500",
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  progressText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#6366f1",
+    minWidth: 30,
+  },
+})

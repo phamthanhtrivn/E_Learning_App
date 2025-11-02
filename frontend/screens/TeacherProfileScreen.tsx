@@ -14,32 +14,9 @@ import CourseCard from "../components/CourseCard";
 import StarRating from "../components/StarRating";
 import { useFetch } from "../hooks/useFetch";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
-type Review = {
-  userId: { name: string; avatar: string };
-  rating: number;
-  comment: string;
-  courseId: { title: string };
-};
-
-type Course = {
-  id: string;
-  title: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  lessons: number;
-  thumbnail: string;
-};
-
-type Teacher = {
-  name: string;
-  job: string;
-  location: string;
-  courseCount: number;
-  rating: number;
-  reviewCount: number;
-};
+import { Teacher } from "../types/Types";
+import { Course } from "../types/Types";
+import { Review } from "../types/Types";
 
 const TeacherProfile = () => {
   const route = useRoute();
@@ -119,7 +96,6 @@ const TeacherProfile = () => {
         <ProfileHeader user={teacherData} />
 
         <View style={styles.coursesSection}>
-          {/* Tabs */}
           <View style={styles.tabRow}>
             {(["overview", "courses", "review"] as const).map((tab) => (
               <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
@@ -135,7 +111,6 @@ const TeacherProfile = () => {
             ))}
           </View>
 
-          {/* Overview */}
           {activeTab === "overview" && (
             <View style={{ padding: 20 }}>
               <Text style={styles.overviewName}>{teacherData.name}</Text>
@@ -165,7 +140,6 @@ const TeacherProfile = () => {
             </View>
           )}
 
-          {/* Courses */}
           {activeTab === "courses" && (
             <View>
               <View style={styles.courseHeader}>
@@ -185,12 +159,13 @@ const TeacherProfile = () => {
 
               {displayedCourses.map((course) => (
                 <CourseCard
-                  key={course.id}
+                  key={course._id}
+                  _id={course._id}
                   title={course.title}
                   price={course.price}
                   rating={course.rating}
                   reviewCount={course.reviewCount}
-                  lessonCount={course.lessons}
+                  lessonCount={course.lessonCount}
                   thumbnail={course.thumbnail}
                   orientation="horizontal"
                 />
@@ -198,7 +173,6 @@ const TeacherProfile = () => {
             </View>
           )}
 
-          {/* Reviews */}
           {activeTab === "review" && (
             <View style={styles.tabContent}>
               <View style={styles.ratingSummary}>
@@ -209,7 +183,6 @@ const TeacherProfile = () => {
                 </Text>
               </View>
 
-              {/* Filter */}
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -229,7 +202,7 @@ const TeacherProfile = () => {
                         style={[
                           styles.ratingFilterText,
                           activeRating === star &&
-                            styles.ratingFilterTextActive,
+                          styles.ratingFilterTextActive,
                         ]}
                       >
                         All
@@ -240,7 +213,7 @@ const TeacherProfile = () => {
                           style={[
                             styles.ratingFilterText,
                             activeRating === star &&
-                              styles.ratingFilterTextActive,
+                            styles.ratingFilterTextActive,
                           ]}
                         >
                           {star} ★
@@ -251,30 +224,33 @@ const TeacherProfile = () => {
                 ))}
               </ScrollView>
 
-              {/* Reviews */}
               {filteredReviews.length === 0 ? (
                 <Text style={styles.noReviewText}>No reviews found.</Text>
               ) : (
                 filteredReviews.map((r, i) => (
+
                   <View key={i} style={styles.reviewItem}>
                     <View style={styles.reviewHeader}>
                       <Image
                         source={{
                           uri:
-                            r.userId?.avatar ||
-                            "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+                            typeof r.userId === "object" && "avatar" in r.userId
+                              ? r.userId.avatar
+                              : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
                         }}
                         style={styles.avatar}
                       />
                       <View>
                         <Text style={styles.reviewerName}>
-                          {r.userId?.name}
+                          {typeof r.userId === "object" && "name" in r.userId
+                            ? r.userId.name
+                            : "Anonymous"}
                         </Text>
                         <StarRating value={r.rating} />
                       </View>
                     </View>
                     <Text style={styles.reviewComment}>{r.comment}</Text>
-                    {r.courseId?.title && (
+                    {typeof r.courseId === "object" && "title" in r.courseId && (
                       <Text style={styles.reviewCourse}>
                         • Course: {r.courseId.title}
                       </Text>

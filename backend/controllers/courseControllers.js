@@ -4,11 +4,11 @@ import User from "../models/User.js";
 import Review from "../models/Review.js";
 import Question from "../models/Question.js";
 
-export const add = async (req, res) => {};
+export const add = async (req, res) => { };
 
-export const update = async (req, res) => {};
+export const update = async (req, res) => { };
 
-export const del = async (req, res) => {};
+export const del = async (req, res) => { };
 
 export const findByCategory = async (req, res) => {
   try {
