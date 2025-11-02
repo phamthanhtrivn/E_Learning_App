@@ -208,7 +208,7 @@ const renderSection = (
         horizontal={orientation === "vertical"}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <CourseCard {...item} orientation={orientation} />
+          <CourseCard {...item} teacherName={item.teacher.name} orientation={orientation} />
         )}
         showsHorizontalScrollIndicator={false}
         style={styles.coursesList}

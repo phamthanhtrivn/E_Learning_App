@@ -125,7 +125,11 @@ export default function SearchScreen() {
                   horizontal
                   keyExtractor={(item) => item._id}
                   renderItem={({ item }) => (
-                    <CourseCard {...item} orientation="vertical" />
+                    <CourseCard
+                      {...item}
+                      teacherName={item.teacher.name}
+                      orientation="vertical"
+                    />
                   )}
                   showsHorizontalScrollIndicator={false}
                   style={styles.coursesList}

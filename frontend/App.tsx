@@ -78,7 +78,7 @@ const MainTabs = () => {
         component={UserProfileScreen}
         options={{
           headerShown: true,
-          title: "User's Profile",
+          title: "Profile",
           headerRight: () => (
             <Menu>
               <MenuTrigger>
@@ -145,7 +145,7 @@ export default function App() {
                 options={{ headerShown: false }}
               />
               <Stack.Screen name="Learning" component={LearningScreen} />
-              <Stack.Screen name="Cart" component={CartScreen} />
+              <Stack.Screen name="Cart" component={CartScreen} options={{ headerBackTitle: "Back", title: "My Cart"}} />
 
               <Stack.Screen name="Rating" component={RatingScreen} />
               <Stack.Screen

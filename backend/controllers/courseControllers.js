@@ -220,7 +220,6 @@ export const getInspirationalCourses = async (req, res) => {
       },
       { $unwind: "$teacher" },
       { $sort: { rating: -1, reviewCount: -1 } },
-      { $limit: 5 },
     ]);
 
     if (!courses || courses.length === 0) {

@@ -29,6 +29,10 @@ export type Course = {
   lessonCount: number;
   totalDuration: string;
   teacherId: string | Teacher;
+  teacher: {
+    _id: string;
+    name: string;
+  }
   categoryId: string;
   thumbnail: string;
   benefits: string[];
