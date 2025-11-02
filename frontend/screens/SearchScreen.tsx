@@ -16,6 +16,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext";
 import { Category, Course, User } from "../types/Types";
 import SearchResults from "../components/SearchResults";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SearchScreen() {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ export default function SearchScreen() {
   const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([]);
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const navigation = useNavigation<any>();
 
   const fetchCategories = async () => {
     const data = await get("/categories");
@@ -35,6 +37,14 @@ export default function SearchScreen() {
       `/courses/recommended/${user && (user as User)?._id}`
     );
     if (data) setRecommendedCourses(data);
+  };
+
+  const handleViewMoreR = () => {
+    navigation.navigate("ListView", {
+      name: "Recommended Courses",
+      data: recommendedCourses,
+      type: "course",
+    });
   };
 
   useEffect(() => {
@@ -102,14 +112,16 @@ export default function SearchScreen() {
               {/* Recommended section */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Recommended for you</Text>
-                <Text style={styles.viewMore}>View more</Text>
+                <TouchableOpacity onPress={handleViewMoreR}>
+                  <Text style={styles.viewMore}>View more</Text>
+                </TouchableOpacity>
               </View>
 
               {isLoading ? (
                 <ActivityIndicator size="large" color="#0A8AFF" animating />
               ) : (
                 <FlatList
-                  data={recommendedCourses}
+                  data={recommendedCourses.slice(0, 5)}
                   horizontal
                   keyExtractor={(item) => item._id}
                   renderItem={({ item }) => (

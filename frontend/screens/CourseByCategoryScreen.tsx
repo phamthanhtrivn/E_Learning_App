@@ -10,7 +10,6 @@ import { useRoute } from "@react-navigation/native";
 import CourseCard from "../components/CourseCard";
 import { Course } from "../types/Types";
 import { useFetch } from "../hooks/useFetch";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CourseByCategoryScreen() {
   const { get, isLoading } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);

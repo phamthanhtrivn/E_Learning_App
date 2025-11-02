@@ -23,6 +23,8 @@ import {
 import { Text } from "react-native";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import CourseByCategoryScreen from "./screens/CourseByCategoryScreen";
+import CoursesListScreen from "./screens/ListViewScreen";
+import ListViewScreen from "./screens/ListViewScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -151,6 +153,14 @@ export default function App() {
                 component={CourseByCategoryScreen}
                 options={({ route }) => ({
                   title: `${(route.params as any)?.name} Courses` || "Courses",
+                  headerBackTitle: "Back",
+                })}
+              />
+              <Stack.Screen
+                name="ListView"
+                component={ListViewScreen}
+                options={({ route }) => ({
+                  title: `${(route.params as any)?.name}` || "Courses",
                   headerBackTitle: "Back",
                 })}
               />

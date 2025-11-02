@@ -38,7 +38,7 @@ export const del = async (req, res) => {
 };
 
 export const findAll = async (req, res) => {
-  const teachers = await Teacher.find().sort({ rating: -1, reviewCount: -1 }).limit(5);
+  const teachers = await Teacher.find().sort({ rating: -1, reviewCount: -1 });
 
   return res.json(teachers);
 };

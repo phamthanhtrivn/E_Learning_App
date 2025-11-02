@@ -128,15 +128,11 @@ export const getPopularCourses = async (req, res) => {
     const userId = req.params.userId;
 
     const enrolledCourses = await Enrollment.find({ userId }).distinct("courseId");
-    const user = await User.findById(userId).lean();
-    const savedCourseIds = user?.savedCourses || [];
-
-    const excludedCourses = [...enrolledCourses, ...savedCourseIds];
 
     const courses = await Course.aggregate([
       {
         $match: {
-          _id: { $nin: excludedCourses },
+          _id: { $nin: enrolledCourses },
         },
       },
       {
@@ -149,7 +145,6 @@ export const getPopularCourses = async (req, res) => {
       },
       { $unwind: "$teacher" },
       { $sort: { rating: -1, reviewCount: -1 } },
-      { $limit: 5 },
     ]);
 
     res.json(courses);
@@ -164,10 +159,6 @@ export const getRecommendedCourses = async (req, res) => {
     const userId = req.params.userId;
 
     const enrolled = await Enrollment.find({ userId }).distinct("courseId");
-    const user = await User.findById(userId).lean();
-    const savedCourseIds = user?.savedCourses || [];
-
-    const excludedCourses = [...enrolled, ...savedCourseIds];
 
     const categories = await Course.find({
       _id: { $in: enrolled },
@@ -178,11 +169,11 @@ export const getRecommendedCourses = async (req, res) => {
     if (categories.length > 0) {
       query = {
         categoryId: { $in: categories },
-        _id: { $nin: excludedCourses },
+        _id: { $nin: enrolled },
       };
     } else {
       query = {
-        _id: { $nin: excludedCourses },
+        _id: { $nin: enrolled },
       };
     }
 
@@ -196,8 +187,7 @@ export const getRecommendedCourses = async (req, res) => {
           as: "teacher",
         },
       },
-      { $unwind: "$teacher" },
-      { $limit: 5 },
+      { $unwind: "$teacher" }
     ]);
 
     res.json(recommendedCourses);
@@ -211,22 +201,13 @@ export const getInspirationalCourses = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    // Lấy danh sách course user đã mua
     const enrolledCourses = await Enrollment.find({ userId }).distinct("courseId");
 
-    // Lấy danh sách course user đã lưu
-    const user = await User.findById(userId).lean();
-    const savedCourseIds = user?.savedCourses || [];
-
-    // Gộp các course cần loại trừ
-    const excludedCourses = [...enrolledCourses, ...savedCourseIds];
-
-    // Lấy course truyền cảm hứng mà user chưa mua/lưu
     const courses = await Course.aggregate([
       {
         $match: {
           isInspirational: true,
-          _id: { $nin: excludedCourses }, // loại bỏ course đã mua hoặc đã lưu
+          _id: { $nin: enrolledCourses }, 
         },
       },
       {
