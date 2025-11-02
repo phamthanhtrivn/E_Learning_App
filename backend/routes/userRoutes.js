@@ -1,6 +1,6 @@
 import express from 'express'
 import authUser from '../middlewares/authUser.js'
-import { add, del, findAll, findById, login, register, toggleSavedCourse, update, verifyToken, getCart, addToCart, deleteFromCart } from '../controllers/userControllers.js'
+import { add, del, findAll, findById, login, register, toggleSavedCourse, update, verifyToken, getCart, addToCart, deleteFromCart, clearCart } from '../controllers/userControllers.js'
 
 const userRoute = express.Router()
 
@@ -16,6 +16,7 @@ userRoute.get('/', findAll)
 userRoute.get('/cart/:id', getCart)
 userRoute.post('/cart', addToCart)
 userRoute.delete('/cart/:userId/:courseId', deleteFromCart)
+userRoute.get('/cart/clear/:userId', clearCart)
 
 
 export default userRoute

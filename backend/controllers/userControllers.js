@@ -14,15 +14,25 @@ const createToken = (user) => {
 export const verifyToken = async (req, res) => {
   try {
     const user = await User.findById(req.userId)
-      .populate("savedCourses")
-      .populate("cart")
+      .populate({
+        path: "savedCourses",
+        populate: { path: "teacherId", select: "name" } // populate teacher
+      })
+      .populate({
+        path: "cart",
+        populate: { path: "teacherId", select: "name" } // populate teacher
+      })
       .select("-password");
+
     if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
+
     res.json({ user });
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Lỗi xác thực" });
   }
 };
+
 
 export const register = async (req, res) => { };
 
@@ -44,6 +54,23 @@ export const login = async (req, res) => {
 export const add = async (req, res) => { };
 
 export const update = async (req, res) => { };
+
+export const clearCart = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.cart = []; // xóa toàn bộ cart
+    await user.save();
+
+    res.json({ message: "Cart cleared successfully", cart: user.cart });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const findById = async (req, res) => {
   try {

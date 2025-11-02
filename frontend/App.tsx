@@ -27,6 +27,7 @@ import CourseByCategoryScreen from "./screens/CourseByCategoryScreen";
 import CoursesListScreen from "./screens/ListViewScreen";
 import ListViewScreen from "./screens/ListViewScreen";
 import CartScreen from "./screens/CartScreen";
+import CheckoutScreen from "./screens/CheckoutScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -169,6 +170,7 @@ export default function App() {
                   headerBackTitle: "Back",
                 })}
               />
+              <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: "Checkout"}} />
             </Stack.Navigator>
           </NavigationContainer>
         </MenuProvider>

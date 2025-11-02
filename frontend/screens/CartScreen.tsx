@@ -6,18 +6,21 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import { Course } from "../types/Types";
 import { useAuth } from "../contexts/AuthContext";
 import { useFetch } from "../hooks/useFetch";
+import { useNavigation } from "@react-navigation/native";
 
 export default function CartScreen() {
   const { user } = useAuth();
   const [items, setItems] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const { get, del } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
+  const navigation = useNavigation<any>()
 
   const fetchCart = async () => {
     if (!user?._id) return;
@@ -81,6 +84,10 @@ export default function CartScreen() {
     }
   };
 
+  const handleCheckout = () => {
+    navigation.navigate("Checkout");
+  }
+
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
   const tax = Math.round(subtotal * 0.1);
   const total = subtotal + tax;
@@ -138,7 +145,7 @@ export default function CartScreen() {
               <Text style={styles.totalText}>Total</Text>
               <Text style={styles.totalPrice}>₫{total}</Text>
             </View>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={handleCheckout}>
               <Text style={styles.buttonText}>Proceed to Checkout</Text>
             </TouchableOpacity>
           </View>

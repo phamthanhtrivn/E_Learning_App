@@ -75,7 +75,6 @@ export default function CourseDetailScreen() {
     try {
       const res = await post("/users/cart", { userId: user._id, courseId: course._id });
       if (!res) return;
-
       alert(res.alreadyInCart ? "Course already in cart" : "Course added to cart!");
       setIsInCart(true);
     } catch (err) {
