@@ -28,8 +28,8 @@ export type Course = {
   reviewCount: number;
   lessonCount: number;
   totalDuration: string;
-  teacherId: string; 
-  categoryId: string; 
+  teacherId: string | Teacher;
+  categoryId: string;
   thumbnail: string;
   benefits: string[];
   sections: Section[];
@@ -68,8 +68,8 @@ export type EnrollmentStatus = "ONGOING" | "COMPLETED";
 
 export type Enrollment = {
   _id: string;
-  userId: string; 
-  courseId: string; 
+  userId: string;
+  courseId: string | Course;
   enrollmentDate: string;
   progress: number;
   status: EnrollmentStatus;
@@ -77,7 +77,7 @@ export type Enrollment = {
 
 export type Answer = {
   _id: string;
-  userId: string | User; 
+  userId: string | User;
   content: string;
   likes: number;
   createdAt: string;
@@ -85,8 +85,8 @@ export type Answer = {
 
 export type Question = {
   _id: string;
-  userId: string | User; 
-  courseId: string | Course; 
+  userId: string | User;
+  courseId: string | Course;
   content: string;
   likes: number;
   createdAt: string;
@@ -111,3 +111,8 @@ export type Review = {
   dateTime: string;
 };
 
+export type counts = {
+  saved: number;
+  ongoing: number;
+  completed: number;
+};

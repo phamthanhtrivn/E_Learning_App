@@ -1,23 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import StarRating from './StarRating';
-
-type Review = {
-    userId: { name: string; avatar: string };
-    rating: number;
-    comment: string;
-};
+import { Review } from '../types/Types';
 
 const ReviewItem = ({ review }: { review: Review }) => (
     <View style={styles.reviewCard}>
         {/* Hàng đầu: avatar + tên + rating */}
         <View style={styles.headerRow}>
             <Image
-                source={{ uri: review.userId.avatar }}
+                source={{
+                    uri: typeof review.userId === "object" && "avatar" in review.userId
+                        ? review.userId.avatar
+                        : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                }}
                 style={styles.avatar}
             />
             <View style={styles.infoContainer}>
-                <Text style={styles.reviewUser}>{review.userId.name}</Text>
+                <Text style={styles.reviewUser}>{typeof review.userId === "object" && "name" in review.userId
+                    ? review.userId.name
+                    : "Anonymous"}</Text>
                 <StarRating value={review.rating} />
             </View>
         </View>

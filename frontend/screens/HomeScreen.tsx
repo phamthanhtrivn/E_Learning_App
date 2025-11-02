@@ -16,7 +16,8 @@ import CourseCard from "../components/CourseCard";
 import TeacherCard from "../components/TeacherCard";
 import { useAuth } from "../contexts/AuthContext";
 import { Category, Course, Teacher, User } from "../types/Types";
-
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from "../types/Types";
 export default function HomeScreen() {
   const { user } = useAuth();
   const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
@@ -26,6 +27,7 @@ export default function HomeScreen() {
   const [inspirationalCourses, setInspirationalCourses] = useState<Course[]>(
     []
   );
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [topTeachers, setTopTeachers] = useState<Teacher[]>([]);
 
   const fetchCategories = async () => {
@@ -70,7 +72,7 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!user) return; 
+    if (!user) return;
     fetchPopularCourses();
     fetchRecommendedCourses();
     fetchInspirationalCourses();
@@ -90,7 +92,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.headerRight}>
-            <Ionicons name="cart-outline" size={22} style={styles.icon} />
+            <Ionicons onPress={() => navigation.navigate("Cart")} name="cart-outline" size={22} style={styles.icon} />
             <Ionicons
               name="notifications-outline"
               size={22}

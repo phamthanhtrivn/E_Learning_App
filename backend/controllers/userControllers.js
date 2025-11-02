@@ -24,7 +24,7 @@ export const verifyToken = async (req, res) => {
   }
 };
 
-export const register = async (req, res) => {};
+export const register = async (req, res) => { };
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -41,15 +41,14 @@ export const login = async (req, res) => {
   res.json({ token, user: userData });
 };
 
-export const add = async (req, res) => {};
+export const add = async (req, res) => { };
 
-export const update = async (req, res) => {};
+export const update = async (req, res) => { };
 
 export const findById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ Lấy thông tin user
     const user = await User.findById(id).populate({
       path: "savedCourses",
       model: Course,
@@ -64,7 +63,6 @@ export const findById = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 2️⃣ Lấy các khoá học mà user đang học và đã học
     const enrollments = await Enrollment.find({ userId: id }).populate({
       path: "courseId",
       model: Course,
@@ -75,7 +73,6 @@ export const findById = async (req, res) => {
       ],
     });
 
-    // 3️⃣ Phân loại khoá học theo trạng thái
     const ongoingCourses = enrollments
       .filter((en) => en.status === "ONGOING")
       .map((en) => ({
@@ -90,7 +87,6 @@ export const findById = async (req, res) => {
         progress: en.progress,
       }));
 
-    // 4️⃣ Chuẩn hoá kết quả trả về
     const result = {
       user: {
         _id: user._id,
@@ -110,14 +106,93 @@ export const findById = async (req, res) => {
       },
     };
 
-    return res.json(result);
+    return res.json(result); tôi
   } catch (error) {
     console.error("Error finding user:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
-export const del = async (req, res) => {};
+export const addToCart = async (req, res) => {
+  const { userId, courseId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const alreadyInCart = user.cart.some((id) => id.equals(courseId));
+
+    if (alreadyInCart) {
+      return res.status(200).json({
+        message: "Course already in cart",
+        cart: user.cart,
+        alreadyInCart: true,
+      });
+    } else {
+      user.cart.push(courseId);
+      await user.save();
+      return res.status(200).json({
+        message: "Course added to cart",
+        cart: user.cart,
+        alreadyInCart: false,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+export const deleteFromCart = async (req, res) => {
+  const { userId, courseId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.cart = user.cart.filter(
+      (id) => !id.equals(courseId)
+    );
+    await user.save();
+    res.status(200).json({
+      message: "Course removed from cart",
+      cart: user.cart,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+export const getCart = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById({ _id: id }).populate({
+      path: "cart",
+      model: "course",
+      select: "title price thumbnail teacherId ",
+      populate: {
+        path: "teacherId",
+        model: "teacher",
+        select: "name"
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ cart: user.cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+
+
+export const del = async (req, res) => { };
 
 export const findAll = async (req, res) => {
   const users = await User.find();

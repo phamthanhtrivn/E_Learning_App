@@ -17,36 +17,12 @@ import CourseCard from "../components/CourseCard";
 import SectionAccordion from "../components/SectionAccordion";
 import ReviewItem from "../components/ReviewItem";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// ====== TYPES ======
-type Lesson = { title: string; duration: string; isLocked: boolean };
-type Section = { title: string; order: number; lessons: Lesson[] };
-type Review = {
-  userId: { name: string; avatar: string };
-  rating: number;
-  comment: string;
-};
-type Teacher = {
-  _id: string;
-  name: string;
-  job: string;
-  profilePicture: string;
-};
-
-type Course = {
-  _id: string;
-  title: string;
-  thumbnail: string;
-  description: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  lessonCount: number;
-  benefits: string[];
-  sections: Section[];
-  teacherId: Teacher;
-};
-
+import { Lesson } from "../types/Types";
+import { Section } from "../types/Types";
+import { Review } from "../types/Types";
+import { Teacher } from "../types/Types";
+import { Course } from "../types/Types";
+import { useAuth } from "../contexts/AuthContext";
 type CourseResponse = {
   course: Course;
   reviews: Review[];
@@ -54,13 +30,13 @@ type CourseResponse = {
   courseCategory?: Course[];
 };
 
-// ====== COMPONENT ======
 export default function CourseDetailScreen() {
+  const { user } = useAuth();
   const route = useRoute();
   const navigation = useNavigation();
   const { _id } = route.params as { _id: string };
 
-  const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
+  const { isLoading, error, get, post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [course, setCourse] = useState<Course | null>(null);
   const [teacher, setTeacher] = useState<Teacher | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -69,15 +45,20 @@ export default function CourseDetailScreen() {
     "overview"
   );
   const [selectedRating, setSelectedRating] = useState<number | "All">("All");
+  const [isInCart, setIsInCart] = useState(false);
+  const [adding, setAdding] = useState(false);
 
-  // ====== FETCH DATA ======
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res: CourseResponse = await get(`/courses/${_id}`);
         if (res) {
           setCourse(res.course);
-          setTeacher(res.course.teacherId);
+          const teacherData =
+            typeof res.course.teacherId === "object"
+              ? res.course.teacherId
+              : null
+          setTeacher(teacherData);
           setReviews(res.reviews || []);
           setCourseCategory(res.courseCategory || []);
         }
@@ -87,6 +68,24 @@ export default function CourseDetailScreen() {
     };
     fetchData();
   }, [_id]);
+  const addCart = async () => {
+    if (!user?._id || !course?._id) return;
+    setAdding(true);
+
+    try {
+      const res = await post("/users/cart", { userId: user._id, courseId: course._id });
+      if (!res) return;
+
+      alert(res.alreadyInCart ? "Course already in cart" : "Course added to cart!");
+      setIsInCart(true);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setAdding(false);
+    }
+  };
+
 
   const filteredReviews = useMemo(() => {
     if (selectedRating === "All") return reviews;
@@ -95,7 +94,6 @@ export default function CourseDetailScreen() {
 
   const priceText = useMemo(() => `$${course?.price}`, [course?.price]);
 
-  // ====== UI STATES ======
   if (isLoading)
     return (
       <View style={styles.centered}>
@@ -106,11 +104,9 @@ export default function CourseDetailScreen() {
   if (error) return <Text>Error: {error}</Text>;
   if (!course) return <Text>No course found</Text>;
 
-  // ====== RENDER ======
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* ===== HEADER ===== */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Feather name="chevron-left" size={24} color="#000" />
@@ -119,7 +115,6 @@ export default function CourseDetailScreen() {
           <Feather name="bookmark" size={22} color="#000" />
         </View>
 
-        {/* ===== HERO ===== */}
         <View style={styles.heroContainer}>
           <Image
             source={{ uri: course.thumbnail }}
@@ -130,7 +125,6 @@ export default function CourseDetailScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ===== COURSE TITLE & INFO ===== */}
         <View style={styles.courseTitleSection}>
           <Text style={styles.courseTitle}>{course.title}</Text>
           <View style={styles.courseMetaRow}>
@@ -144,7 +138,6 @@ export default function CourseDetailScreen() {
           </View>
         </View>
 
-        {/* ===== TABS ===== */}
         <View style={styles.tabContainer}>
           {["overview", "lessons", "review"].map((tab) => (
             <TouchableOpacity
@@ -165,10 +158,8 @@ export default function CourseDetailScreen() {
           ))}
         </View>
 
-        {/* ===== OVERVIEW ===== */}
         {activeTab === "overview" && (
           <View style={styles.tabContent}>
-            {/* Teacher */}
             <View style={styles.teacherCard}>
               <Image
                 source={{ uri: teacher?.profilePicture }}
@@ -180,11 +171,9 @@ export default function CourseDetailScreen() {
               </View>
             </View>
 
-            {/* Description */}
             <Text style={styles.sectionHeading}>Description</Text>
             <Text style={styles.description}>{course.description}</Text>
 
-            {/* Benefits */}
             <Text style={styles.sectionHeading}>Benefits</Text>
             {course.benefits.map((b, i) => (
               <View key={i} style={styles.benefitRow}>
@@ -193,7 +182,6 @@ export default function CourseDetailScreen() {
               </View>
             ))}
 
-            {/* Similar Courses */}
             {courseCategory.length > 0 && (
               <View style={styles.coursesSection}>
                 <Text style={styles.sectionHeading}>Similar courses</Text>
@@ -215,7 +203,6 @@ export default function CourseDetailScreen() {
           </View>
         )}
 
-        {/* ===== LESSONS ===== */}
         {activeTab === "lessons" && (
           <View style={styles.tabContent}>
             {course.sections.map((s, i) => (
@@ -224,7 +211,6 @@ export default function CourseDetailScreen() {
           </View>
         )}
 
-        {/* ===== REVIEWS ===== */}
         {activeTab === "review" && (
           <View style={styles.tabContent}>
             <View style={styles.rowBetween}>
@@ -237,7 +223,6 @@ export default function CourseDetailScreen() {
               <Text style={styles.viewAll}>View all</Text>
             </View>
 
-            {/* Filter by star */}
             <View style={styles.filterRow}>
               {["All", 5, 4, 3, 2, 1].map((rating) => (
                 <TouchableOpacity
@@ -260,7 +245,6 @@ export default function CourseDetailScreen() {
               ))}
             </View>
 
-            {/* Review list */}
             {filteredReviews.length === 0 ? (
               <Text style={{ textAlign: "center", marginTop: 10 }}>
                 No reviews found
@@ -272,21 +256,26 @@ export default function CourseDetailScreen() {
         )}
       </ScrollView>
 
-      {/* ===== FOOTER ===== */}
       <View style={styles.footer}>
         <View>
           <Text style={styles.price}>{priceText}</Text>
         </View>
-        <TouchableOpacity style={styles.cartBtn}>
-          <Feather name="shopping-cart" size={16} color="#fff" />
-          <Text style={styles.cartText}>Buy</Text>
+        <TouchableOpacity onPress={addCart} style={styles.cartBtn} disabled={adding}>
+          {adding ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <>
+              <Feather name="shopping-cart" size={16} color="#fff" />
+              <Text style={styles.cartText}>Buy</Text>
+            </>
+          )}
         </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   );
 }
 
-// ====== STYLES ======
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },

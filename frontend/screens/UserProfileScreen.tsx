@@ -12,31 +12,12 @@ import CourseCard from "../components/CourseCard";
 import { useFetch } from "../hooks/useFetch";
 import { useAuth } from "../contexts/AuthContext";
 import { Course } from "../types/Types";
-
-export type counts = {
-  saved: number;
-  ongoing: number;
-  completed: number;
-};
-export type UserProfile = {
-  _id?: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
-  location?: string;
-  profilePicture?: string;
-  job?: string;
-  phone?: string;
-  savedCourses?: Course[];
-  courseCount?: number;
-  rating?: number;
-  reviewCount?: number;
-};
-
+import { User } from "../types/Types";
+import { counts } from "../types/Types";
 const UserProfile = () => {
   const { user } = useAuth();
   const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
-  const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [userData, setUserData] = useState<User | null>(null);
   const [savedCourses, setSavedCourses] = useState<Course[]>([]);
   const [counts, setCounts] = useState<counts>({
     saved: 0,
@@ -51,7 +32,7 @@ const UserProfile = () => {
       setCounts(data.counts);
     };
     fetchUser();
-  }, []);
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -85,10 +66,10 @@ const UserProfile = () => {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        <ProfileHeader user={userData} />
+        <ProfileHeader user={user} />
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{counts.saved}</Text>
+            <Text style={styles.statNumber}>{savedCourses.length}</Text>
             <Text style={styles.statLabel}>Save</Text>
           </View>
           <View style={styles.statItem}>
@@ -104,9 +85,21 @@ const UserProfile = () => {
         <View style={styles.coursesSection}>
           <Text style={styles.sectionTitle}>Saved courses</Text>
 
-          {savedCourses.map((course) => (
-            <CourseCard {...course} orientation="horizontal" />
-          ))}
+          {savedCourses.map((course, index) => {
+            console.log("🔍 course item:", course.teacherId);
+            return (
+              <CourseCard
+                key={course._id || index}
+                {...{
+                  ...course,
+                  teacherName:
+                    typeof course.teacherId === "object" ? course.teacherId.name : "",
+                }}
+                orientation="horizontal"
+              />
+            );
+          })
+          }
         </View>
       </ScrollView>
     </View>

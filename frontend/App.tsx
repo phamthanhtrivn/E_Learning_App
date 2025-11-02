@@ -20,9 +20,10 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
+import Toast from "react-native-toast-message";
 import { Text } from "react-native";
 import EditProfileScreen from "./screens/EditProfileScreen";
-
+import CartScreen from "./screens/CartScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -122,6 +123,8 @@ export default function App() {
       <AuthProvider>
         <MenuProvider>
           <NavigationContainer>
+            <Toast />
+
             <Stack.Navigator initialRouteName="Login">
               <Stack.Screen
                 name="Login"
@@ -139,6 +142,8 @@ export default function App() {
                 options={{ headerShown: false }}
               />
               <Stack.Screen name="Learning" component={LearningScreen} />
+              <Stack.Screen name="Cart" component={CartScreen} />
+
               <Stack.Screen name="Rating" component={RatingScreen} />
               <Stack.Screen
                 name="TeacherProfile"
