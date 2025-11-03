@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { Feather } from "@expo/vector-icons";
 import { useFetch } from "../hooks/useFetch";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -34,7 +35,7 @@ export default function CourseDetailScreen() {
   const { user } = useAuth();
   const route = useRoute();
   const navigation = useNavigation();
-  const { _id } = route.params as { _id: string };
+  const { _id, isSaved } = route.params as { _id: string, isSaved: boolean };
 
   const { isLoading, error, get, post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
   const [course, setCourse] = useState<Course | null>(null);
@@ -111,7 +112,7 @@ export default function CourseDetailScreen() {
             <Feather name="chevron-left" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Course details</Text>
-          <Feather name="bookmark" size={22} color="#000" />
+          <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} size={22} color={isSaved ? "#00AEEF" : "#ccc"} />
         </View>
 
         <View style={styles.heroContainer}>
@@ -195,6 +196,8 @@ export default function CourseDetailScreen() {
                     lessonCount={c.lessonCount}
                     thumbnail={c.thumbnail}
                     orientation="horizontal"
+
+
                   />
                 ))}
               </View>

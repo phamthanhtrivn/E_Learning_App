@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, { useEffect } from "react"
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
@@ -40,6 +40,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const { post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL)
   const [isSaved, setIsSaved] = useState((user as User)?.savedCourses?.includes(_id) || false)
   const [isLoading, setIsLoading] = useState(false)
+  useEffect(() => {
+    if (user && user.savedCourses) {
+      const saved = user.savedCourses.some(course =>
+        typeof course === "string" ? course === _id : course._id === _id
+      )
+      setIsSaved(saved)
+    }
+  }, [user, _id])
+
 
   const styles = StyleSheet.create({
     container: {
@@ -136,7 +145,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const navigation = useNavigation<any>()
 
   const handleNavigate = () => {
-    navigation.navigate("CourseDetail", { _id })
+    navigation.navigate("CourseDetail", { _id, isSaved })
   }
 
   const handleToggleSave = async () => {
