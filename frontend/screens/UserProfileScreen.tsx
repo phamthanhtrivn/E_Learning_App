@@ -86,20 +86,20 @@ const UserProfile = () => {
           <Text style={styles.sectionTitle}>Saved courses</Text>
 
           {savedCourses.map((course, index) => {
-            console.log("🔍 course item:", course.teacherId);
             return (
               <CourseCard
                 key={course._id || index}
                 {...{
                   ...course,
                   teacherName:
-                    typeof course.teacherId === "object" ? course.teacherId.name : "",
+                    typeof course.teacherId === "object"
+                      ? course.teacherId.name
+                      : "",
                 }}
                 orientation="horizontal"
               />
             );
-          })
-          }
+          })}
         </View>
       </ScrollView>
     </View>

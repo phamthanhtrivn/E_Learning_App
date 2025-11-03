@@ -5,6 +5,7 @@ import {
   findAll,
   findByCategory,
   findById,
+  findByIdCourse,
   getInspirationalCourses,
   getPopularCourses,
   getRecommendedCourses,
@@ -24,5 +25,6 @@ courseRoute.get("/inspirational/:userId", getInspirationalCourses);
 courseRoute.get("/search", searchCourses);
 courseRoute.get("/category/:categoryId", findByCategory)
 courseRoute.get("/:id", findById);
+courseRoute.get("/learning/:id", findByIdCourse);
 
 export default courseRoute;

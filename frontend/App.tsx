@@ -145,7 +145,7 @@ export default function App() {
                 component={CourseDetailScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="Learning" component={LearningScreen} />
+              <Stack.Screen name="Learning" component={LearningScreen} options={{ headerBackTitle: "Back"}}/>
               <Stack.Screen name="Cart" component={CartScreen} options={{ headerBackTitle: "Back", title: "My Cart"}} />
 
               <Stack.Screen name="Rating" component={RatingScreen} />

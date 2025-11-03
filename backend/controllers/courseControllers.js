@@ -3,6 +3,7 @@ import Enrollment from "../models/Enrollment.js";
 import User from "../models/User.js";
 import Review from "../models/Review.js";
 import Question from "../models/Question.js";
+import Project from "../models/Project.js";
 
 export const add = async (req, res) => { };
 
@@ -115,6 +116,55 @@ export const findById = async (req, res) => {
     });
   }
 
+};
+
+export const findByIdCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // ✅ Lấy questions + answers + user info
+    const questions = await Question.find({ courseId: id })
+      .populate("userId", "name avatar")
+      .populate("answers.userId", "name avatar")
+      .sort({ createdAt: -1 });
+
+    // ✅ Lấy projects + user info
+    const projects = await Project.find({ courseId: id })
+      .populate("userId", "name avatar")
+      .sort({ createdAt: -1 });
+
+    const result = {
+      course: {
+        _id: course._id,
+        title: course.title,
+        thumbnail: course.thumbnail,
+        description: course.description,
+        lessonCount: course.sections?.reduce(
+          (sum, sec) => sum + (sec.lessons?.length || 0),
+          0
+        ),
+        sections: course.sections,
+        resources: course.resources,
+        questions,
+        projects
+      }
+    };
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    console.error("❌ Error fetching course details:", error);
+    res.status(500).json({
+      message: "Server error while fetching course details",
+      error: error.message,
+    });
+  }
 };
 
 export const findAll = async (req, res) => {

@@ -7,13 +7,15 @@ import * as Progress from "react-native-progress"
 import { LinearGradient } from "expo-linear-gradient"
 import { useFetch } from "../hooks/useFetch"
 import { useAuth } from "../contexts/AuthContext"
-import type { Enrollment } from "../types/Types"
+import type { Course, Enrollment } from "../types/Types"
+import { useNavigation } from "@react-navigation/native"
 
 export default function MyCoursesScreen() {
   const { user } = useAuth()
   const { isLoading, error, get } = useFetch(process.env.EXPO_PUBLIC_BASE_URL)
   const [activeTab, setActiveTab] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL")
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
+  const navigation = useNavigation<any>()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,6 +30,10 @@ export default function MyCoursesScreen() {
     return e.status === activeTab
   })
 
+  const handleCourseLearn = (courseId: string) => {
+    navigation.navigate("Learning", { _id: courseId})
+  }
+
   if (isLoading)
     return (
       <View style={styles.centered}>
@@ -39,8 +45,6 @@ export default function MyCoursesScreen() {
 
   return (
     <View style={styles.container}>
-
-
       <LinearGradient
         colors={["#6366f1", "#8b5cf6"]}
         start={{ x: 0, y: 0 }}
@@ -83,7 +87,7 @@ export default function MyCoursesScreen() {
         keyExtractor={(item) => item._id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.courseCard} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.courseCard} activeOpacity={0.85} onPress={() => handleCourseLearn(typeof item.courseId === "object" ? item.courseId._id : "")}>
             <Image
               source={{ uri: typeof item.courseId === "object" ? item.courseId.thumbnail : "" }}
               style={styles.courseImage}
