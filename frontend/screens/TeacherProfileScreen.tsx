@@ -113,32 +113,24 @@ const TeacherProfile = () => {
 
           {activeTab === "overview" && (
             <View style={{ padding: 20 }}>
-              <Text style={styles.overviewName}>{teacherData.name}</Text>
-              <Text style={styles.overviewJob}>
-                {teacherData.job || "No job title provided"}
-              </Text>
-
-              <View style={styles.overviewInfoBox}>
-                <Text style={styles.overviewLabel}>Location:</Text>
-                <Text style={styles.overviewValue}>
-                  {teacherData.location || "Not specified"}
+              {teacherData.bio ? (
+                // Tách câu bằng regex, giữ dấu chấm, hỏi, chấm than
+                teacherData.bio
+                  .split(/(?<=[.!?])\s+/)
+                  .map((sentence, index) => (
+                    <Text key={index} style={styles.overviewBioParagraph}>
+                      {sentence.trim()}
+                    </Text>
+                  ))
+              ) : (
+                <Text style={styles.overviewBioParagraph}>
+                  No biography available.
                 </Text>
-              </View>
-
-              <Text style={styles.overviewStat}>
-                Courses: {teacherData.courseCount}
-              </Text>
-              <Text style={styles.overviewStat}>Rating: {avgRating}</Text>
-              <Text style={styles.overviewStat}>
-                Reviews: {teacherData.reviewCount}
-              </Text>
-
-              <Text style={styles.overviewBio}>
-                This instructor has not provided a bio yet. Stay tuned to learn
-                more about their teaching style and expertise!
-              </Text>
+              )}
             </View>
           )}
+
+
 
           {activeTab === "courses" && (
             <View>
@@ -356,6 +348,13 @@ const styles = StyleSheet.create({
   },
   ratingFilterText: { fontSize: 14, color: "#374151", fontWeight: "500" },
   ratingFilterTextActive: { color: "#fff" },
+  overviewBioParagraph: {
+    fontSize: 15,
+    lineHeight: 22, // khoảng cách dòng
+    color: "#374151",
+    marginBottom: 12, // khoảng cách giữa các đoạn
+  }
+
 });
 
 export default TeacherProfile;
