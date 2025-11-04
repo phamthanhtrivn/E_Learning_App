@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -6,68 +6,49 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator } from "react-native-paper";
-import { useFetch } from "../hooks/useFetch";
 import { useNavigation } from "@react-navigation/native";
-import { useAuth } from "../contexts/AuthContext";
 
-export default function LoginScreen() {
-  const { isLoading, post } = useFetch(process.env.EXPO_PUBLIC_BASE_URL);
+export default function SignUpScreen() {
+  const navigation = useNavigation<any>();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { setAuth } = useAuth();
-  const navigation = useNavigation<any>();
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Validation Error", "Please enter both email and password.");
-      return;
-    }
-
-    const response = await post("/users/login", { email, password });
-
-    if (response?.token && response?.user) {
-      await setAuth(response.token, response.user);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "MainTabs" as never }],
-      });
-    } else {
-      Alert.alert(
-        "Error",
-        response?.message || "Login failed. Please try again."
-      );
-    }
-  };
+  const [job, setJob] = useState("");
+  const [phone, setPhone] = useState("");
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Header */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>E-Learning</Text>
-          <Text style={styles.subtitle}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Create your account</Text>
         </View>
 
-        {/* Form Container */}
         <View style={styles.formContainer}>
-          {/* Email Field */}
+          {/* Full Name */}
+          <View style={styles.fieldGroup}>
+            <Text style={styles.label}>Full Name</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons name="person-outline" size={20} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your full name"
+                placeholderTextColor="#999"
+                value={name}
+                onChangeText={setName}
+              />
+            </View>
+          </View>
+
+          {/* Email */}
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>Email Address</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                style={styles.inputIcon}
-              />
+              <Ionicons name="mail-outline" size={20} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Enter your email"
@@ -75,20 +56,15 @@ export default function LoginScreen() {
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
-                editable={!isLoading}
               />
             </View>
           </View>
 
-          {/* Password Field */}
+          {/* Password */}
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                style={styles.inputIcon}
-              />
+              <Ionicons name="lock-closed-outline" size={20} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Enter your password"
@@ -96,7 +72,6 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                editable={!isLoading}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
@@ -108,30 +83,47 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          {/* Forgot Password */}
-          <TouchableOpacity style={styles.forgotContainer} onPress={() => navigation.navigate("ForgotPassword")}>
-            <Text style={styles.forgotText}>Forgot Password?</Text>
-          </TouchableOpacity>
+          {/* Job */}
+          <View style={styles.fieldGroup}>
+            <Text style={styles.label}>Job</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons name="briefcase-outline" size={20} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your job / occupation"
+                placeholderTextColor="#999"
+                value={job}
+                onChangeText={setJob}
+              />
+            </View>
+          </View>
 
-          {/* Login Button */}
-          <TouchableOpacity
-            style={[styles.loginBtn, isLoading && styles.loginBtnDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <Text style={styles.loginBtnText}>Sign In</Text>
-            )}
+          {/* Phone */}
+          <View style={styles.fieldGroup}>
+            <Text style={styles.label}>Phone Number</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons name="call-outline" size={20} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your phone number"
+                placeholderTextColor="#999"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+              />
+            </View>
+          </View>
+
+          {/* Submit Button (chưa có logic) */}
+          <TouchableOpacity style={styles.submitBtn}>
+            <Text style={styles.submitBtnText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Sign Up Link */}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-            <Text style={styles.signupLink}>Sign Up</Text>
+        <View style={styles.bottomTextContainer}>
+          <Text style={styles.bottomText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.bottomLink}>Sign In</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -151,7 +143,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 80,
-    marginTop: 120,
+    marginTop: 20,
     alignItems: "center",
   },
   logo: {
@@ -209,7 +201,7 @@ const styles = StyleSheet.create({
     color: "#2563eb",
     fontWeight: "500",
   },
-  loginBtn: {
+  submitBtn: {
     backgroundColor: "#2563eb",
     paddingVertical: 14,
     borderRadius: 12,
@@ -217,56 +209,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 20,
   },
-  loginBtnDisabled: {
+  submitBtnDisabled: {
     opacity: 0.7,
   },
-  loginBtnText: {
+  submitBtnText: {
     fontSize: 16,
     fontWeight: "700",
     color: "#fff",
   },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#334155",
-  },
-  dividerText: {
-    marginHorizontal: 12,
-    fontSize: 12,
-    color: "#64748b",
-  },
-  socialContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
-  },
-  socialBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: "#1e293b",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#334155",
-  },
-  signupContainer: {
+  bottomTextContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: "auto",
     paddingBottom: 20,
   },
-  signupText: {
+  bottomText: {
     fontSize: 14,
     color: "#cbd5e1",
   },
-  signupLink: {
+  bottomLink: {
     fontSize: 14,
     color: "#2563eb",
     fontWeight: "700",
