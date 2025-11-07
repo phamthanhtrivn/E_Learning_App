@@ -51,9 +51,49 @@ export const login = async (req, res) => {
   res.json({ token, user: userData });
 };
 
-export const add = async (req, res) => { };
+export const add = async (req, res) => {
 
-export const update = async (req, res) => { };
+};
+
+export const update = async (req, res) => {
+  try {
+    const userId = req.params.id; // /users/:id
+    const { name, email, password, avatar, job, phone } = req.body;
+
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng." });
+    }
+
+    let hashedPassword = existingUser.password;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    existingUser.name = name ?? existingUser.name;
+    existingUser.email = email ?? existingUser.email;
+    existingUser.password = hashedPassword;
+    existingUser.avatar = avatar ?? existingUser.avatar;
+    existingUser.job = job ?? existingUser.job;
+    existingUser.phone = phone ?? existingUser.phone;
+
+    const updatedUser = await existingUser.save();
+
+    const { password: _, ...userData } = updatedUser.toObject();
+
+    res.status(200).json({
+      message: "Cập nhật thông tin người dùng thành công.",
+      user: userData,
+    });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật user:", error);
+    res.status(500).json({
+      message: "Lỗi máy chủ khi cập nhật người dùng.",
+      error: error.message,
+    });
+  }
+
+};
 
 export const clearCart = async (req, res) => {
   const { userId } = req.params;

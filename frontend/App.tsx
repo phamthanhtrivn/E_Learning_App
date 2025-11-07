@@ -28,6 +28,7 @@ import CartScreen from "./screens/CartScreen";
 import CheckoutScreen from "./screens/CheckoutScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
+import DetailProfileUserScreen from "./screens/DetailProfileUserScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -103,7 +104,7 @@ const MainTabs = () => {
                   },
                 }}
               >
-                <MenuOption onSelect={() => console.log("Chỉnh sửa thông tin")}>
+                <MenuOption onSelect={() => navigation.navigate("DetailProfileUser")}>
                   <Text style={{ padding: 8, fontSize: 15 }}>
                     ✏️ Chỉnh sửa thông tin
                   </Text>
@@ -186,6 +187,12 @@ export default function App() {
               />
               <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
               <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+              <Stack.Screen
+                name="DetailProfileUser"
+                component={DetailProfileUserScreen}
+                options={{ title: "Profile Details", headerBackTitle: "Back" }}
+              />
+
             </Stack.Navigator>
           </NavigationContainer>
         </MenuProvider>
