@@ -4,8 +4,8 @@ import HomeScreen from "./screens/HomeScreen";
 import SearchScreen from "./screens/SearchScreen";
 import MyCoursesScreen from "./screens/MyCoursesScreen";
 import UserProfileScreen from "./screens/UserProfileScreen";
-import { NavigationContainer } from "@react-navigation/native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import CourseDetailScreen from "./screens/CourseDetailScreen";
 import LearningScreen from "./screens/LearningScreen";
 import RatingScreen from "./screens/RatingScreen";
@@ -22,16 +22,17 @@ import {
 } from "react-native-popup-menu";
 import Toast from "react-native-toast-message";
 import { Text } from "react-native";
-import EditProfileScreen from "./screens/EditProfileScreen";
 import CourseByCategoryScreen from "./screens/CourseByCategoryScreen";
-import CoursesListScreen from "./screens/ListViewScreen";
 import ListViewScreen from "./screens/ListViewScreen";
 import CartScreen from "./screens/CartScreen";
 import CheckoutScreen from "./screens/CheckoutScreen";
+import SignUpScreen from "./screens/SignUpScreen";
+import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const MainTabs = () => {
+  const navigation = useNavigation<any>();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -107,7 +108,7 @@ const MainTabs = () => {
                     ✏️ Chỉnh sửa thông tin
                   </Text>
                 </MenuOption>
-                <MenuOption onSelect={() => console.log("Đăng xuất")}>
+                <MenuOption onSelect={() => navigation.reset({ index: 0, routes: [{ name: "Login" }] })}>
                   <Text style={{ padding: 8, color: "red", fontSize: 15 }}>
                     🚪 Đăng xuất
                   </Text>
@@ -145,8 +146,16 @@ export default function App() {
                 component={CourseDetailScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="Learning" component={LearningScreen} options={{ headerBackTitle: "Back"}}/>
-              <Stack.Screen name="Cart" component={CartScreen} options={{ headerBackTitle: "Back", title: "My Cart"}} />
+              <Stack.Screen
+                name="Learning"
+                component={LearningScreen}
+                options={{ headerBackTitle: "Back" }}
+              />
+              <Stack.Screen
+                name="Cart"
+                component={CartScreen}
+                options={{ headerBackTitle: "Back", title: "My Cart" }}
+              />
 
               <Stack.Screen name="Rating" component={RatingScreen} />
               <Stack.Screen
@@ -170,7 +179,13 @@ export default function App() {
                   headerBackTitle: "Back",
                 })}
               />
-              <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: "Checkout"}} />
+              <Stack.Screen
+                name="Checkout"
+                component={CheckoutScreen}
+                options={{ title: "Checkout" }}
+              />
+              <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
             </Stack.Navigator>
           </NavigationContainer>
         </MenuProvider>
