@@ -162,7 +162,7 @@ export default function App() {
               <Stack.Screen
                 name="TeacherProfile"
                 component={TeacherProfileScreen}
-                options={{ title: "Teacher Profile", headerBackVisible: true }}
+                options={{ title: "Teacher Profile", headerBackVisible: true, headerBackTitle: "Back" }}
               />
               <Stack.Screen
                 name="CourseByCategory"
